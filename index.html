@@ -23,9 +23,12 @@ button { background:var(--primary); color:white; font-weight:bold; border:none; 
 .filter-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
 .tab { background: #ccc; padding: 10px 20px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; font-weight: bold;}
 .tab.active { background: var(--primary); color: white; }
+
+/* BREEDING PEDIGREE STYLE */
 .breed-card { background: #fff; border-radius: 12px; padding: 15px; border: 1px solid #eee; }
-.breed-imgs { display: flex; gap: 5px; margin-bottom: 10px; }
-.breed-imgs img { width: 50%; height: 100px; object-fit: cover; border-radius: 8px; background: #f0f0f0; }
+.pedigree-box { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 10px; }
+.tree-line { width: 20px; border-left: 2px solid #ccc; height: 40px; margin-left: 10px; }
+
 .table-wrapper { overflow-x:auto; }
 table { width:100%; border-collapse:collapse; }
 th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; font-size:13px; }
@@ -62,7 +65,7 @@ th { background:#f8f9fa; color:#666; font-size:11px; text-transform:uppercase; }
   <h3>Farm Dashboard</h3>
   <div class="grid">
     <div class="card">Total Stock: <b id="statStock">0</b></div>
-    <div class="card">Monthly Profit (KES): <b id="statProfit">0</b></div>
+    <div class="card">Monthly Profit: <b id="statProfit">0</b></div>
   </div>
   <div class="card"><canvas id="mainChart" style="height:250px"></canvas></div>
 </section>
@@ -70,7 +73,6 @@ th { background:#f8f9fa; color:#666; font-size:11px; text-transform:uppercase; }
 <section id="animals">
   <div class="card">
     <h3>Animal Inventory</h3>
-    <p>Select category to view:</p>
     <div class="filter-tabs">
       <div class="tab active" onclick="filterCategory('All', this)">All</div>
       <div class="tab" onclick="filterCategory('Cow', this)">Cows</div>
@@ -79,12 +81,11 @@ th { background:#f8f9fa; color:#666; font-size:11px; text-transform:uppercase; }
       <div class="tab" onclick="filterCategory('Pig', this)">Pigs</div>
     </div>
     <div id="animalGrid" class="grid"></div>
-    
     <div class="owner-only" style="margin-top:20px; border-top:2px solid #eee; padding-top:15px;">
-      <h4>Register New Animal</h4>
-      <input id="a_tag" placeholder="Animal Tag/Name">
+      <h4>New Registration</h4>
+      <input id="a_tag" placeholder="Tag/Name">
       <select id="a_type"><option>Cow</option><option>Goat</option><option>Sheep</option><option>Pig</option></select>
-      <button onclick="saveData('animals')">Save to Stock</button>
+      <button onclick="saveData('animals')">Add Animal</button>
     </div>
   </div>
 </section>
@@ -93,9 +94,9 @@ th { background:#f8f9fa; color:#666; font-size:11px; text-transform:uppercase; }
   <div class="card">
     <h3>🥛 Daily Production</h3>
     <input id="p_src" placeholder="Animal ID">
-    <input id="p_qty" type="number" placeholder="Quantity">
+    <input id="p_qty" type="number" placeholder="Liters/Kgs">
     <input type="date" id="p_date">
-    <button onclick="saveData('prod')">Save Record</button>
+    <button onclick="saveData('prod')">Record Production</button>
     <div class="table-wrapper">
       <table><thead><tr><th>Date</th><th>ID</th><th>Qty</th><th>Action</th></tr></thead><tbody id="prodTable"></tbody></table>
     </div>
@@ -104,9 +105,9 @@ th { background:#f8f9fa; color:#666; font-size:11px; text-transform:uppercase; }
 
 <section id="poultry">
   <div class="card">
-    <h3>🥚 Poultry Management</h3>
+    <h3>🥚 Poultry Log</h3>
     <div class="grid"><input type="date" id="pou_date"><input type="number" id="pou_eggs" placeholder="Eggs Collected"><input type="number" id="pou_dmg" placeholder="Damaged"></div>
-    <button onclick="saveData('poultry')">Save Daily Log</button>
+    <button onclick="saveData('poultry')">Save Entry</button>
     <div class="table-wrapper">
       <table><thead><tr><th>Date</th><th>Eggs</th><th>Dmg</th><th>Action</th></tr></thead><tbody id="poultryTable"></tbody></table>
     </div>
@@ -115,20 +116,26 @@ th { background:#f8f9fa; color:#666; font-size:11px; text-transform:uppercase; }
 
 <section id="breeding">
   <div class="card">
-    <h3>🧬 Breeding Records</h3>
+    <h3>🧬 Pedigree & Breeding</h3>
     <div id="breedingGrid" class="grid"></div>
     <div class="owner-only" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
-      <div class="grid"><input id="b_dam" placeholder="Dam ID"><input id="b_sire" placeholder="Sire ID"><input type="date" id="b_date"><input type="file" id="b_img" accept="image/*"></div>
-      <button onclick="saveData('breeding')">Save Breeding Card</button>
+      <h4>New Pedigree Entry</h4>
+      <div class="grid">
+          <input id="b_name" placeholder="Animal Name/ID">
+          <input id="b_dam" placeholder="Dam (Mother)">
+          <input id="b_sire" placeholder="Sire (Father)">
+          <input type="date" id="b_date">
+      </div>
+      <button onclick="saveData('breeding')">Save Breeding Record</button>
     </div>
   </div>
 </section>
 
 <section id="health">
   <div class="card">
-    <h3>💉 Health & Vaccine</h3>
-    <input id="h_id" placeholder="Animal ID"><input id="h_med" placeholder="Treatment Name"><input type="date" id="h_date">
-    <button onclick="saveData('health')">Save Record</button>
+    <h3>💉 Health Records</h3>
+    <input id="h_id" placeholder="Animal ID"><input id="h_med" placeholder="Treatment/Vaccine"><input type="date" id="h_date">
+    <button onclick="saveData('health')">Record Health Event</button>
     <div class="table-wrapper">
       <table><thead><tr><th>Date</th><th>ID</th><th>Treatment</th><th>Action</th></tr></thead><tbody id="healthTable"></tbody></table>
     </div>
@@ -137,47 +144,69 @@ th { background:#f8f9fa; color:#666; font-size:11px; text-transform:uppercase; }
 
 <section id="finance">
   <div class="card">
-    <h3>💰 Finance Ledger</h3>
+    <h3>💰 Financial Ledger</h3>
     <div class="table-wrapper">
       <table><thead><tr><th>Date</th><th>Desc</th><th>Type</th><th>Amt</th><th>Action</th></tr></thead><tbody id="financeTable"></tbody></table>
     </div>
-    <div style="margin-top:20px; background:#f9f9f9; padding:15px; border-radius:10px;">
-      <div class="grid"><input id="f_desc" placeholder="Details"><input id="f_amt" type="number" placeholder="Amount"><select id="f_type"><option>Income</option><option>Expense</option></select><input type="date" id="f_date"></div>
-      <button onclick="saveData('finance')">Post to Ledger</button>
+    <div class="owner-only" style="margin-top:20px; background:#f9f9f9; padding:15px; border-radius:10px;">
+      <h4>Post Transaction</h4>
+      <div class="grid">
+          <input id="f_desc" placeholder="e.g. Feed, Milk Sales">
+          <input id="f_amt" type="number" placeholder="Amount">
+          <select id="f_type"><option>Income</option><option>Expense</option></select>
+          <input type="date" id="f_date">
+      </div>
+      <button onclick="saveData('finance')">Save Transaction</button>
     </div>
   </div>
 </section>
 
 <section id="reports">
     <div class="card">
-        <h3>Farm Reports</h3>
-        <button onclick="exportCSV()" style="background:#00796b">📥 Export Finance CSV</button>
-        <button onclick="window.print()" style="background:#444; margin-top:10px;">🖨️ Print Monthly Report</button>
-        <h4 style="margin-top:30px;">Monthly Comparison History</h4>
-        <div id="monthlyBreakdown"></div>
+        <h3>Reports & Exports</h3>
+        <button onclick="exportCSV()" style="background:#00796b">📥 Download Finance CSV</button>
+        <button onclick="window.print()" style="background:#444; margin-top:10px;">🖨️ Print Monthly PDF</button>
+        <div id="monthlyBreakdown" style="margin-top:20px"></div>
     </div>
 </section>
 
 <section id="settings">
   <div class="card">
-    <h3>⚙️ Settings</h3>
-    <label>Farm Branding</label><input id="s_name" placeholder="Farm Name">
-    <label>New Security Password</label><input id="s_pass" type="password" placeholder="New Password">
-    <button onclick="saveSettings()">Apply Changes</button>
+    <h3>⚙️ Admin & Staff Access</h3>
+    <div style="border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
+        <h4>My Account</h4>
+        <input id="s_name" placeholder="Farm Name">
+        <input id="s_pass" type="password" placeholder="Change Owner Password">
+    </div>
+    <div style="background:#fff9c4; padding:15px; border-radius:8px;">
+        <h4>Staff Access Control</h4>
+        <label>Worker Password</label>
+        <input id="s_worker_pass" placeholder="Worker1 Password">
+        <label>Worker Status</label>
+        <select id="s_worker_status">
+            <option value="active">✅ Access Granted</option>
+            <option value="locked">🚫 Account Locked</option>
+        </select>
+    </div>
+    <button onclick="saveSettings()" style="margin-top:20px;">Save Changes</button>
   </div>
 </section>
 
 <script>
-// DATA & LOGIN
-let config = JSON.parse(localStorage.getItem("f_config") || JSON.stringify({ name: "Felix Kinyanjui Mburu", ownerPass: "Lovechild38816513@", workerPass: "Farm2024" }));
+let config = JSON.parse(localStorage.getItem("f_config") || JSON.stringify({ name: "Felix Farm", ownerPass: "Lovechild38816513@", workerPass: "Farm2024", workerStatus: "active" }));
 let db = { animals: JSON.parse(localStorage.getItem("f_animals")||"[]"), prod: JSON.parse(localStorage.getItem("f_prod")||"[]"), poultry: JSON.parse(localStorage.getItem("f_poultry")||"[]"), breeding: JSON.parse(localStorage.getItem("f_breeding")||"[]"), health: JSON.parse(localStorage.getItem("f_health")||"[]"), finance: JSON.parse(localStorage.getItem("f_finance")||"[]") };
 
 function handleLogin() {
-    if((userInp.value === "Felix" && passInp.value === config.ownerPass) || (userInp.value === "Worker1" && passInp.value === config.workerPass)) {
-        localStorage.setItem("loggedUser", userInp.value);
-        initApp();
-    } else { loginMsg.innerText = "Wrong Password!"; }
+    const user = userInp.value;
+    const pass = passInp.value;
+    if(user === "Felix" && pass === config.ownerPass) {
+        localStorage.setItem("loggedUser", user); initApp();
+    } else if (user === "Worker1" && pass === config.workerPass) {
+        if(config.workerStatus === "locked") { loginMsg.innerText = "Access Revoked by Owner."; }
+        else { localStorage.setItem("loggedUser", user); initApp(); }
+    } else { loginMsg.innerText = "Invalid Credentials"; }
 }
+
 function logout() { localStorage.removeItem("loggedUser"); location.reload(); }
 
 function initApp() {
@@ -194,7 +223,6 @@ function showSection(id) {
     if(id === 'dashboard') renderChart();
 }
 
-// CATEGORY FILTERING LOGIC
 let activeCat = "All";
 function filterCategory(cat, el) {
     activeCat = cat;
@@ -205,14 +233,9 @@ function filterCategory(cat, el) {
 
 function renderAnimalsList() {
     const list = db.animals.filter(a => activeCat === "All" || a.type === activeCat);
-    animalGrid.innerHTML = list.map(a => `
-        <div class="card" style="border-top:2px solid #ccc; text-align:center;">
-            <b>${a.tag}</b><br><small>${a.type}</small>
-            ${localStorage.getItem("loggedUser")==='Felix' ? `<br><button class="btn-del" onclick="deleteItem('animals',${a.id})">Delete</button>` : ''}
-        </div>`).join('');
+    animalGrid.innerHTML = list.map(a => `<div class="card" style="border-top:2px solid #ccc; text-align:center;"><b>${a.tag}</b><br><small>${a.type}</small>${localStorage.getItem("loggedUser")==='Felix'?`<br><button class="btn-del" onclick="deleteItem('animals',${a.id})">Delete</button>`:''}</div>`).join('');
 }
 
-// CRUD
 async function saveData(type) {
     const entry = { id: Date.now() };
     if(type==='animals'){ entry.tag=a_tag.value; entry.type=a_type.value; }
@@ -220,15 +243,13 @@ async function saveData(type) {
     else if(type==='poultry'){ entry.date=pou_date.value; entry.eggs=pou_eggs.value; entry.dmg=pou_dmg.value; }
     else if(type==='health'){ entry.animal=h_id.value; entry.med=h_med.value; entry.date=h_date.value; }
     else if(type==='finance'){ entry.desc=f_desc.value; entry.amt=parseFloat(f_amt.value); entry.type=f_type.value; entry.date=f_date.value; }
-    else if(type==='breeding'){ entry.dam=b_dam.value; entry.sire=b_sire.value; entry.date=b_date.value; if(b_img.files[0]) entry.img = await toBase64(b_img.files[0]); }
+    else if(type==='breeding'){ entry.name=b_name.value; entry.dam=b_dam.value; entry.sire=b_sire.value; entry.date=b_date.value; }
     
     db[type].push(entry);
     localStorage.setItem("f_"+type, JSON.stringify(db[type]));
     refreshUI();
-    alert("Record Saved Successfully!");
+    alert("Saved!");
 }
-
-const toBase64 = file => new Promise(res => { const r = new FileReader(); r.readAsDataURL(file); r.onload = () => res(r.result); });
 
 function deleteItem(key, id) {
     if(confirm("Confirm Delete?")) { db[key] = db[key].filter(i => i.id !== id); localStorage.setItem("f_"+key, JSON.stringify(db[key])); refreshUI(); }
@@ -237,11 +258,8 @@ function deleteItem(key, id) {
 function editItem(key, id) {
     const item = db[key].find(i => i.id === id);
     if(key==='prod'){ p_src.value=item.src; p_qty.value=item.qty; p_date.value=item.date; }
-    else if(key==='poultry'){ pou_date.value=item.date; pou_eggs.value=item.eggs; pou_dmg.value=item.dmg; }
-    else if(key==='health'){ h_id.value=item.animal; h_med.value=item.med; h_date.value=item.date; }
     else if(key==='finance'){ f_desc.value=item.desc; f_amt.value=item.amt; f_type.value=item.type; f_date.value=item.date; }
     deleteItem(key, id);
-    alert("Record loaded into form for editing.");
 }
 
 function refreshUI() {
@@ -254,26 +272,41 @@ function refreshUI() {
     financeTable.innerHTML = db.finance.map(f => `<tr><td>${f.date}</td><td>${f.desc}</td><td style="color:${f.type==='Income'?'green':'red'}">${f.type}</td><td>${f.amt}</td><td>${actionBtn(f.id, 'finance')}</td></tr>`).join('');
     
     renderAnimalsList();
-    breedingGrid.innerHTML = db.breeding.map(b => `<div class="breed-card"><div class="breed-imgs"><img src="${b.img||'https://via.placeholder.com/80'}"><img src="https://via.placeholder.com/80?text=Sire"></div>Dam: ${b.dam} | Sire: ${b.sire}<br><small>Date: ${b.date}</small>${isFelix?`<br><button class="btn-del" onclick="deleteItem('breeding',${b.id})">X</button>`:''}</div>`).join('');
+    
+    breedingGrid.innerHTML = db.breeding.map(b => `
+        <div class="breed-card">
+            <b>Animal: ${b.name}</b><br>
+            <div class="pedigree-box">
+                <div>D: ${b.dam}</div>
+                <div class="tree-line"></div>
+                <div>S: ${b.sire}</div>
+            </div>
+            <small>Date: ${b.date}</small>
+            ${isFelix?`<br><button class="btn-del" onclick="deleteItem('breeding',${b.id})">Delete</button>`:''}
+        </div>`).join('');
 
     statStock.innerText = db.animals.length;
     let inc=0, exp=0; const m = new Date().toISOString().slice(0,7);
     db.finance.filter(f=>f.date.startsWith(m)).forEach(f=>{ if(f.type==='Income') inc+=f.amt; else exp+=f.amt; });
-    statProfit.innerText = (inc-exp);
-    
-    const months = {};
-    db.finance.forEach(f => { const mon = f.date.slice(0,7); if(!months[mon]) months[mon]={i:0,e:0}; if(f.type==='Income') months[mon].i+=f.amt; else months[mon].e+=f.amt; });
-    monthlyBreakdown.innerHTML = Object.keys(months).reverse().map(m => `<div class="card"><b>${m}</b><br>In: ${months[m].i} | Exp: ${months[m].e} | <b>Net: ${months[m].i-months[m].e}</b></div>`).join('');
+    statProfit.innerText = "KES " + (inc-exp);
 }
 
 let chartObj = null;
 function renderChart() {
     const ctx = mainChart.getContext('2d'); if(chartObj) chartObj.destroy();
-    chartObj = new Chart(ctx, { type: 'bar', data: { labels: ['Animals', 'Profit'], datasets:[{label:'Farm Stats', data:[db.animals.length, parseInt(statProfit.innerText)], backgroundColor:['#2e7d32','#ffa000']}] }});
+    chartObj = new Chart(ctx, { type: 'bar', data: { labels: ['Animals', 'Profit'], datasets:[{label:'Farm Stats', data:[db.animals.length, parseInt(statProfit.innerText.split(' ')[1])||0], backgroundColor:['#2e7d32','#ffa000']}] }});
 }
 
-function saveSettings() { if(s_name.value) config.name = s_name.value; if(s_pass.value) config.ownerPass = s_pass.value; localStorage.setItem("f_config", JSON.stringify(config)); alert("Settings Saved!"); location.reload(); }
-function exportCSV() { let csv = "Date,Type,Amt\n"+db.finance.map(f=>`${f.date},${f.type},${f.amt}`).join("\n"); const a = document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download="FinanceReport.csv"; a.click(); }
+function saveSettings() {
+    if(s_name.value) config.name = s_name.value;
+    if(s_pass.value) config.ownerPass = s_pass.value;
+    if(s_worker_pass.value) config.workerPass = s_worker_pass.value;
+    config.workerStatus = s_worker_status.value;
+    localStorage.setItem("f_config", JSON.stringify(config));
+    alert("Settings Saved!"); location.reload();
+}
+
+function exportCSV() { let csv = "Date,Type,Amt\n"+db.finance.map(f=>`${f.date},${f.type},${f.amt}`).join("\n"); const a = document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download="FarmFinance.csv"; a.click(); }
 
 if(localStorage.getItem("loggedUser")) initApp();
 </script>
