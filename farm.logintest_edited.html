@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Farm Manager Pro - Felix</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root { --primary: #2e7d32; --danger: #d32f2f; --light: #f4f6f8; --warn: #ffa000; --white: #ffffff; }
+body{margin:0;font-family:'Segoe UI',sans-serif;background:#eef2f3;color:#333;padding-bottom:50px}
+nav { display:none; background:var(--primary); padding:10px; overflow-x:auto; white-space:nowrap; position:sticky; top:0; z-index:1000; }
+nav button { background:rgba(255,255,255,0.15); border:none; color:white; padding:10px 18px; margin-right:5px; border-radius:20px; font-size:13px; cursor:pointer; }
+section { display:none; padding:15px; max-width:1100px; margin:auto; }
+section.active { display:block }
+#loginSection.active { display:flex; justify-content:center; align-items:center; min-height:100vh }
+.login-card { background:var(--white); padding:30px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1); width:320px; border-top:5px solid var(--primary); }
+.card { background:var(--white); padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); }
+.grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:15px }
+input, select, button { width:100%; padding:12px; margin-top:10px; border:1px solid #ddd; border-radius:8px; font-size:15px; box-sizing:border-box }
+button { background:var(--primary); color:white; font-weight:bold; border:none; cursor:pointer; }
+.btn-del { background:var(--danger); font-size:11px; width:auto; padding:5px 8px; margin-left:4px; border-radius:4px; }
+.btn-edit { background:var(--warn); font-size:11px; width:auto; padding:5px 8px; border-radius:4px; color: #000; }
+.filter-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+.tab { background: #ccc; padding: 10px 20px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; font-weight: bold;}
+.tab.active { background: var(--primary); color: white; }
+.breed-card { background: #fff; border-radius: 12px; padding: 15px; border: 1px solid #eee; }
+.breed-imgs { display: flex; gap: 5px; margin-bottom: 10px; }
+.breed-imgs img { width: 50%; height: 100px; object-fit: cover; border-radius: 8px; background: #f0f0f0; }
+.table-wrapper { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; font-size:13px; }
+th { background:#f8f9fa; color:#666; font-size:11px; text-transform:uppercase; }
+@media print { nav, button, input, select, .owner-only { display: none !important; } section { display: block !important; } }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <button onclick="showSection('dashboard')">🏠 Dash</button>
+  <button onclick="showSection('animals')">🐾 Animals</button>
+  <button onclick="showSection('production')">🥛 Prod</button>
+  <button onclick="showSection('poultry')">🥚 Poultry</button>
+  <button onclick="showSection('breeding')">🧬 Breeding</button>
+  <button onclick="showSection('health')">💉 Health</button>
+  <button class="owner-only" onclick="showSection('finance')">💰 Finance</button>
+  <button class="owner-only" onclick="showSection('reports')">📈 Reports</button>
+  <button class="owner-only" onclick="showSection('settings')">⚙️ Settings</button>
+  <button onclick="logout()" style="background:var(--danger)">Logout</button>
+</nav>
+
+<section id="loginSection" class="active">
+  <div class="login-card">
+    <h2 style="text-align:center; color:var(--primary); margin-bottom:20px;">Farm Pro Login</h2>
+    <input type="text" id="userInp" placeholder="Username">
+    <input type="password" id="passInp" placeholder="Password">
+    <button onclick="handleLogin()">Sign In</button>
+    <p id="loginMsg" style="color:red; text-align:center; font-size:13px; margin-top:10px;"></p>
+  </div>
+</section>
+
+<section id="dashboard">
+  <h3>Farm Dashboard</h3>
+  <div class="grid">
+    <div class="card">Total Stock: <b id="statStock">0</b></div>
+    <div class="card">Monthly Profit (KES): <b id="statProfit">0</b></div>
+  </div>
+  <div class="card"><canvas id="mainChart" style="height:250px"></canvas></div>
+</section>
+
+<section id="animals">
+  <div class="card">
+    <h3>Animal Inventory</h3>
+    <p>Select category to view:</p>
+    <div class="filter-tabs">
+      <div class="tab active" onclick="filterCategory('All', this)">All</div>
+      <div class="tab" onclick="filterCategory('Cow', this)">Cows</div>
+      <div class="tab" onclick="filterCategory('Goat', this)">Goats</div>
+      <div class="tab" onclick="filterCategory('Sheep', this)">Sheep</div>
+      <div class="tab" onclick="filterCategory('Pig', this)">Pigs</div>
+    </div>
+    <div id="animalGrid" class="grid"></div>
+    
+    <div class="owner-only" style="margin-top:20px; border-top:2px solid #eee; padding-top:15px;">
+      <h4>Register New Animal</h4>
+      <input id="a_tag" placeholder="Animal Tag/Name">
+      <select id="a_type"><option>Cow</option><option>Goat</option><option>Sheep</option><option>Pig</option></select>
+      <button onclick="saveData('animals')">Save to Stock</button>
+    </div>
+  </div>
+</section>
+
+<section id="production">
+  <div class="card">
+    <h3>🥛 Daily Production</h3>
+    <input id="p_src" placeholder="Animal ID">
+    <input id="p_qty" type="number" placeholder="Quantity">
+    <input type="date" id="p_date">
+    <button onclick="saveData('prod')">Save Record</button>
+    <div class="table-wrapper">
+      <table><thead><tr><th>Date</th><th>ID</th><th>Qty</th><th>Action</th></tr></thead><tbody id="prodTable"></tbody></table>
+    </div>
+  </div>
+</section>
+
+<section id="poultry">
+  <div class="card">
+    <h3>🥚 Poultry Management</h3>
+    <div class="grid"><input type="date" id="pou_date"><input type="number" id="pou_eggs" placeholder="Eggs Collected"><input type="number" id="pou_dmg" placeholder="Damaged"></div>
+    <button onclick="saveData('poultry')">Save Daily Log</button>
+    <div class="table-wrapper">
+      <table><thead><tr><th>Date</th><th>Eggs</th><th>Dmg</th><th>Action</th></tr></thead><tbody id="poultryTable"></tbody></table>
+    </div>
+  </div>
+</section>
+
+<section id="breeding">
+  <div class="card">
+    <h3>🧬 Breeding Records</h3>
+    <div id="breedingGrid" class="grid"></div>
+    <div class="owner-only" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
+      <div class="grid"><input id="b_dam" placeholder="Dam ID"><input id="b_sire" placeholder="Sire ID"><input type="date" id="b_date"><input type="file" id="b_img" accept="image/*"></div>
+      <button onclick="saveData('breeding')">Save Breeding Card</button>
+    </div>
+  </div>
+</section>
+
+<section id="health">
+  <div class="card">
+    <h3>💉 Health & Vaccine</h3>
+    <input id="h_id" placeholder="Animal ID"><input id="h_med" placeholder="Treatment Name"><input type="date" id="h_date">
+    <button onclick="saveData('health')">Save Record</button>
+    <div class="table-wrapper">
+      <table><thead><tr><th>Date</th><th>ID</th><th>Treatment</th><th>Action</th></tr></thead><tbody id="healthTable"></tbody></table>
+    </div>
+  </div>
+</section>
+
+<section id="finance">
+  <div class="card">
+    <h3>💰 Finance Ledger</h3>
+    <div class="table-wrapper">
+      <table><thead><tr><th>Date</th><th>Desc</th><th>Type</th><th>Amt</th><th>Action</th></tr></thead><tbody id="financeTable"></tbody></table>
+    </div>
+    <div style="margin-top:20px; background:#f9f9f9; padding:15px; border-radius:10px;">
+      <div class="grid"><input id="f_desc" placeholder="Details"><input id="f_amt" type="number" placeholder="Amount"><select id="f_type"><option>Income</option><option>Expense</option></select><input type="date" id="f_date"></div>
+      <button onclick="saveData('finance')">Post to Ledger</button>
+    </div>
+  </div>
+</section>
+
+<section id="reports">
+    <div class="card">
+        <h3>Farm Reports</h3>
+        <button onclick="exportCSV()" style="background:#00796b">📥 Export Finance CSV</button>
+        <button onclick="window.print()" style="background:#444; margin-top:10px;">🖨️ Print Monthly Report</button>
+        <h4 style="margin-top:30px;">Monthly Comparison History</h4>
+        <div id="monthlyBreakdown"></div>
+    </div>
+</section>
+
+<section id="settings">
+  <div class="card">
+    <h3>⚙️ Settings</h3>
+    <label>Farm Branding</label><input id="s_name" placeholder="Farm Name">
+    <label>New Security Password</label><input id="s_pass" type="password" placeholder="New Password">
+    <button onclick="saveSettings()">Apply Changes</button>
+  </div>
+</section>
+
+<script>
+// DATA & LOGIN
+let config = JSON.parse(localStorage.getItem("f_config") || JSON.stringify({ name: "Felix Kinyanjui Mburu", ownerPass: "Lovechild38816513@", workerPass: "Farm2024" }));
+let db = { animals: JSON.parse(localStorage.getItem("f_animals")||"[]"), prod: JSON.parse(localStorage.getItem("f_prod")||"[]"), poultry: JSON.parse(localStorage.getItem("f_poultry")||"[]"), breeding: JSON.parse(localStorage.getItem("f_breeding")||"[]"), health: JSON.parse(localStorage.getItem("f_health")||"[]"), finance: JSON.parse(localStorage.getItem("f_finance")||"[]") };
+
+function handleLogin() {
+    if((userInp.value === "Felix" && passInp.value === config.ownerPass) || (userInp.value === "Worker1" && passInp.value === config.workerPass)) {
+        localStorage.setItem("loggedUser", userInp.value);
+        initApp();
+    } else { loginMsg.innerText = "Wrong Password!"; }
+}
+function logout() { localStorage.removeItem("loggedUser"); location.reload(); }
+
+function initApp() {
+    loginSection.classList.remove("active");
+    navbar.style.display = "flex";
+    document.querySelectorAll(".owner-only").forEach(el => el.style.display = (localStorage.getItem("loggedUser") === "Felix") ? "block" : "none");
+    showSection('dashboard');
+    refreshUI();
+}
+
+function showSection(id) {
+    document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    if(id === 'dashboard') renderChart();
+}
+
+// CATEGORY FILTERING LOGIC
+let activeCat = "All";
+function filterCategory(cat, el) {
+    activeCat = cat;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderAnimalsList();
+}
+
+function renderAnimalsList() {
+    const list = db.animals.filter(a => activeCat === "All" || a.type === activeCat);
+    animalGrid.innerHTML = list.map(a => `
+        <div class="card" style="border-top:2px solid #ccc; text-align:center;">
+            <b>${a.tag}</b><br><small>${a.type}</small>
+            ${localStorage.getItem("loggedUser")==='Felix' ? `<br><button class="btn-del" onclick="deleteItem('animals',${a.id})">Delete</button>` : ''}
+        </div>`).join('');
+}
+
+// CRUD
+async function saveData(type) {
+    const entry = { id: Date.now() };
+    if(type==='animals'){ entry.tag=a_tag.value; entry.type=a_type.value; }
+    else if(type==='prod'){ entry.src=p_src.value; entry.qty=p_qty.value; entry.date=p_date.value; }
+    else if(type==='poultry'){ entry.date=pou_date.value; entry.eggs=pou_eggs.value; entry.dmg=pou_dmg.value; }
+    else if(type==='health'){ entry.animal=h_id.value; entry.med=h_med.value; entry.date=h_date.value; }
+    else if(type==='finance'){ entry.desc=f_desc.value; entry.amt=parseFloat(f_amt.value); entry.type=f_type.value; entry.date=f_date.value; }
+    else if(type==='breeding'){ entry.dam=b_dam.value; entry.sire=b_sire.value; entry.date=b_date.value; if(b_img.files[0]) entry.img = await toBase64(b_img.files[0]); }
+    
+    db[type].push(entry);
+    localStorage.setItem("f_"+type, JSON.stringify(db[type]));
+    refreshUI();
+    alert("Record Saved Successfully!");
+}
+
+const toBase64 = file => new Promise(res => { const r = new FileReader(); r.readAsDataURL(file); r.onload = () => res(r.result); });
+
+function deleteItem(key, id) {
+    if(confirm("Confirm Delete?")) { db[key] = db[key].filter(i => i.id !== id); localStorage.setItem("f_"+key, JSON.stringify(db[key])); refreshUI(); }
+}
+
+function editItem(key, id) {
+    const item = db[key].find(i => i.id === id);
+    if(key==='prod'){ p_src.value=item.src; p_qty.value=item.qty; p_date.value=item.date; }
+    else if(key==='poultry'){ pou_date.value=item.date; pou_eggs.value=item.eggs; pou_dmg.value=item.dmg; }
+    else if(key==='health'){ h_id.value=item.animal; h_med.value=item.med; h_date.value=item.date; }
+    else if(key==='finance'){ f_desc.value=item.desc; f_amt.value=item.amt; f_type.value=item.type; f_date.value=item.date; }
+    deleteItem(key, id);
+    alert("Record loaded into form for editing.");
+}
+
+function refreshUI() {
+    const isFelix = localStorage.getItem("loggedUser") === "Felix";
+    const actionBtn = (id, key) => isFelix ? `<button class="btn-edit" onclick="editItem('${key}',${id})">E</button><button class="btn-del" onclick="deleteItem('${key}',${id})">X</button>` : '-';
+    
+    prodTable.innerHTML = db.prod.map(p => `<tr><td>${p.date}</td><td>${p.src}</td><td>${p.qty}</td><td>${actionBtn(p.id, 'prod')}</td></tr>`).join('');
+    poultryTable.innerHTML = db.poultry.map(p => `<tr><td>${p.date}</td><td>${p.eggs}</td><td>${p.dmg}</td><td>${actionBtn(p.id, 'poultry')}</td></tr>`).join('');
+    healthTable.innerHTML = db.health.map(h => `<tr><td>${h.date}</td><td>${h.animal}</td><td>${h.med}</td><td>${actionBtn(h.id, 'health')}</td></tr>`).join('');
+    financeTable.innerHTML = db.finance.map(f => `<tr><td>${f.date}</td><td>${f.desc}</td><td style="color:${f.type==='Income'?'green':'red'}">${f.type}</td><td>${f.amt}</td><td>${actionBtn(f.id, 'finance')}</td></tr>`).join('');
+    
+    renderAnimalsList();
+    breedingGrid.innerHTML = db.breeding.map(b => `<div class="breed-card"><div class="breed-imgs"><img src="${b.img||'https://via.placeholder.com/80'}"><img src="https://via.placeholder.com/80?text=Sire"></div>Dam: ${b.dam} | Sire: ${b.sire}<br><small>Date: ${b.date}</small>${isFelix?`<br><button class="btn-del" onclick="deleteItem('breeding',${b.id})">X</button>`:''}</div>`).join('');
+
+    statStock.innerText = db.animals.length;
+    let inc=0, exp=0; const m = new Date().toISOString().slice(0,7);
+    db.finance.filter(f=>f.date.startsWith(m)).forEach(f=>{ if(f.type==='Income') inc+=f.amt; else exp+=f.amt; });
+    statProfit.innerText = (inc-exp);
+    
+    const months = {};
+    db.finance.forEach(f => { const mon = f.date.slice(0,7); if(!months[mon]) months[mon]={i:0,e:0}; if(f.type==='Income') months[mon].i+=f.amt; else months[mon].e+=f.amt; });
+    monthlyBreakdown.innerHTML = Object.keys(months).reverse().map(m => `<div class="card"><b>${m}</b><br>In: ${months[m].i} | Exp: ${months[m].e} | <b>Net: ${months[m].i-months[m].e}</b></div>`).join('');
+}
+
+let chartObj = null;
+function renderChart() {
+    const ctx = mainChart.getContext('2d'); if(chartObj) chartObj.destroy();
+    chartObj = new Chart(ctx, { type: 'bar', data: { labels: ['Animals', 'Profit'], datasets:[{label:'Farm Stats', data:[db.animals.length, parseInt(statProfit.innerText)], backgroundColor:['#2e7d32','#ffa000']}] }});
+}
+
+function saveSettings() { if(s_name.value) config.name = s_name.value; if(s_pass.value) config.ownerPass = s_pass.value; localStorage.setItem("f_config", JSON.stringify(config)); alert("Settings Saved!"); location.reload(); }
+function exportCSV() { let csv = "Date,Type,Amt\n"+db.finance.map(f=>`${f.date},${f.type},${f.amt}`).join("\n"); const a = document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download="FinanceReport.csv"; a.click(); }
+
+if(localStorage.getItem("loggedUser")) initApp();
+</script>
+</body>
+</html>
