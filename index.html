@@ -2,311 +2,328 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Farm Manager Pro - Felix</title>
+<title>Felix Farm Management - COMPLETE MASTER</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root { --primary: #2e7d32; --danger: #d32f2f; --light: #f4f6f8; --warn: #ffa000; --white: #ffffff; }
-body{margin:0;font-family:'Segoe UI',sans-serif;background:#eef2f3;color:#333;padding-bottom:50px}
-nav { display:none; background:var(--primary); padding:10px; overflow-x:auto; white-space:nowrap; position:sticky; top:0; z-index:1000; }
-nav button { background:rgba(255,255,255,0.15); border:none; color:white; padding:10px 18px; margin-right:5px; border-radius:20px; font-size:13px; cursor:pointer; }
-section { display:none; padding:15px; max-width:1100px; margin:auto; }
+:root { --primary: #2e7d32; --danger: #d32f2f; --white: #ffffff; --dark: #1b5e20; --warn: #ffa000; }
+body { margin:0; font-family:'Segoe UI',sans-serif; background:#eef2f3; padding-bottom:70px; color:#333; }
+nav { display:none; background:var(--primary); padding:10px; overflow-x:auto; white-space:nowrap; position:sticky; top:0; z-index:1000; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+nav button { background:rgba(255,255,255,0.2); border:none; color:white; padding:10px 15px; margin-right:5px; border-radius:20px; font-weight:bold; cursor:pointer; }
+section { display:none; padding:15px; max-width:900px; margin:auto; animation: fadeIn 0.2s; }
 section.active { display:block }
-#loginSection.active { display:flex; justify-content:center; align-items:center; min-height:100vh }
-.login-card { background:var(--white); padding:30px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1); width:320px; border-top:5px solid var(--primary); }
-.card { background:var(--white); padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); }
-.grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:15px }
-input, select, button { width:100%; padding:12px; margin-top:10px; border:1px solid #ddd; border-radius:8px; font-size:15px; box-sizing:border-box }
-button { background:var(--primary); color:white; font-weight:bold; border:none; cursor:pointer; }
-.btn-del { background:var(--danger); font-size:11px; width:auto; padding:5px 8px; margin-left:4px; border-radius:4px; }
-.btn-edit { background:var(--warn); font-size:11px; width:auto; padding:5px 8px; border-radius:4px; color: #000; }
-.filter-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-.tab { background: #ccc; padding: 10px 20px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; font-weight: bold;}
-.tab.active { background: var(--primary); color: white; }
-
-/* BREEDING PEDIGREE STYLE */
-.breed-card { background: #fff; border-radius: 12px; padding: 15px; border: 1px solid #eee; }
-.pedigree-box { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 10px; }
-.tree-line { width: 20px; border-left: 2px solid #ccc; height: 40px; margin-left: 10px; }
-
-.table-wrapper { overflow-x:auto; }
-table { width:100%; border-collapse:collapse; }
-th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; font-size:13px; }
-th { background:#f8f9fa; color:#666; font-size:11px; text-transform:uppercase; }
-@media print { nav, button, input, select, .owner-only { display: none !important; } section { display: block !important; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.card { background:var(--white); padding:18px; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 12px rgba(0,0,0,0.08); border-top:5px solid var(--primary); }
+.chart-box { height: 220px; margin-bottom: 20px; }
+.search-bar { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; }
+.data-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff; border-radius: 8px; margin-bottom: 5px; }
+.controls { display: flex; gap: 5px; }
+.btn-sm { padding: 6px 10px; font-size: 11px; border-radius: 4px; border:none; cursor: pointer; font-weight:bold; }
+.btn-edit { background: var(--warn); color: #000; }
+.btn-del { background: var(--danger); color: #fff; }
+.tabs { display:flex; gap:5px; overflow-x:auto; margin-bottom:15px; padding-bottom:5px; }
+.tab { background:#ddd; padding:8px 15px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:bold; }
+.tab.active { background:var(--primary); color:white; }
+input, select, textarea, button { width:100%; padding:12px; margin-top:8px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:15px; }
+button { background:var(--primary); color:white; font-weight:bold; border:none; }
+#loginSection.active { display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; background: var(--dark); }
+.total-bar { background:var(--dark); color:white; padding:15px; border-radius:8px; display:flex; justify-content:space-between; font-weight:bold; margin: 10px 0; }
+.history-title { font-size: 14px; font-weight: bold; color: var(--primary); margin-bottom: 10px; display: block; }
 </style>
 </head>
 <body>
 
 <nav id="navbar">
   <button onclick="showSection('dashboard')">🏠 Dash</button>
-  <button onclick="showSection('animals')">🐾 Animals</button>
-  <button onclick="showSection('production')">🥛 Prod</button>
+  <button onclick="showSection('animals')">🐾 Stock</button>
+  <button onclick="showSection('production')">🥛 Milk</button>
   <button onclick="showSection('poultry')">🥚 Poultry</button>
   <button onclick="showSection('breeding')">🧬 Breeding</button>
   <button onclick="showSection('health')">💉 Health</button>
-  <button class="owner-only" onclick="showSection('finance')">💰 Finance</button>
-  <button class="owner-only" onclick="showSection('reports')">📈 Reports</button>
-  <button class="owner-only" onclick="showSection('settings')">⚙️ Settings</button>
+  <button id="nav-fin" onclick="showSection('finance')">💰 Finance</button>
+  <button id="nav-rep" onclick="showSection('reports')">📊 Reports</button>
+  <button id="nav-set" onclick="showSection('settings')">⚙️ Settings</button>
   <button onclick="logout()" style="background:var(--danger)">Logout</button>
 </nav>
 
 <section id="loginSection" class="active">
-  <div class="login-card">
-    <h2 style="text-align:center; color:var(--primary); margin-bottom:20px;">Farm Pro Login</h2>
+  <div class="card" style="width:310px; border:none; text-align:center;">
+    <h2 style="color:var(--primary)">Felix Farm Master</h2>
     <input type="text" id="userInp" placeholder="Username">
     <input type="password" id="passInp" placeholder="Password">
-    <button onclick="handleLogin()">Sign In</button>
-    <p id="loginMsg" style="color:red; text-align:center; font-size:13px; margin-top:10px;"></p>
+    <button onclick="handleLogin()">Login</button>
   </div>
 </section>
 
 <section id="dashboard">
-  <h3>Farm Dashboard</h3>
-  <div class="grid">
-    <div class="card">Total Stock: <b id="statStock">0</b></div>
-    <div class="card">Monthly Profit: <b id="statProfit">0</b></div>
+  <div style="display:flex; gap:10px;">
+    <div class="card" style="flex:1; text-align:center;"><label>Total Stock</label><br><b id="statStock" style="font-size:24px">0</b></div>
+    <div class="card" style="flex:1; text-align:center;"><label>Net Profit</label><br><b id="statProfit" style="font-size:18px">0</b></div>
   </div>
-  <div class="card"><canvas id="mainChart" style="height:250px"></canvas></div>
+  <div class="card">
+    <label>Stock Distribution</label>
+    <div class="chart-box"><canvas id="dashStockChart"></canvas></div>
+  </div>
+  <div class="card">
+    <label>Financial Flow (Income vs Expense)</label>
+    <div class="chart-box"><canvas id="dashFinanceChart"></canvas></div>
+  </div>
 </section>
 
 <section id="animals">
   <div class="card">
-    <h3>Animal Inventory</h3>
-    <div class="filter-tabs">
-      <div class="tab active" onclick="filterCategory('All', this)">All</div>
-      <div class="tab" onclick="filterCategory('Cow', this)">Cows</div>
-      <div class="tab" onclick="filterCategory('Goat', this)">Goats</div>
-      <div class="tab" onclick="filterCategory('Sheep', this)">Sheep</div>
-      <div class="tab" onclick="filterCategory('Pig', this)">Pigs</div>
+    <h3>🐾 Livestock Inventory</h3>
+    <input type="text" class="search-bar" id="a_search" placeholder="Search Tag/Breed..." onkeyup="refreshUI()">
+    <div class="tabs">
+        <div class="tab active" onclick="setFilter('All', this)">All</div>
+        <div class="tab" onclick="setFilter('Cow', this)">Cow</div>
+        <div class="tab" onclick="setFilter('Goat', this)">Goat</div>
+        <div class="tab" onclick="setFilter('Sheep', this)">Sheep</div>
+        <div class="tab" onclick="setFilter('Pig', this)">Pig</div>
     </div>
-    <div id="animalGrid" class="grid"></div>
-    <div class="owner-only" style="margin-top:20px; border-top:2px solid #eee; padding-top:15px;">
-      <h4>New Registration</h4>
-      <input id="a_tag" placeholder="Tag/Name">
-      <select id="a_type"><option>Cow</option><option>Goat</option><option>Sheep</option><option>Pig</option></select>
-      <button onclick="saveData('animals')">Add Animal</button>
+    <div id="animalList"></div>
+    <div class="owner-only" style="border-top:1px solid #eee; margin-top:20px; padding-top:10px;">
+        <h4>Add / Update Animal</h4>
+        <input id="a_tag" placeholder="Tag ID">
+        <select id="a_type"><option>Cow</option><option>Goat</option><option>Sheep</option><option>Pig</option></select>
+        <input id="a_breed" placeholder="Breed Info">
+        <button onclick="saveData('animals')">Save to Stock</button>
     </div>
   </div>
 </section>
 
 <section id="production">
   <div class="card">
-    <h3>🥛 Daily Production</h3>
-    <input id="p_src" placeholder="Animal ID">
-    <input id="p_qty" type="number" placeholder="Liters/Kgs">
+    <h3>🥛 Milk Production</h3>
+    <div class="chart-box"><canvas id="milkTrendChart"></canvas></div>
+    <input id="p_id" placeholder="Animal Tag">
+    <input id="p_qty" type="number" placeholder="Liters Produced">
     <input type="date" id="p_date">
-    <button onclick="saveData('prod')">Record Production</button>
-    <div class="table-wrapper">
-      <table><thead><tr><th>Date</th><th>ID</th><th>Qty</th><th>Action</th></tr></thead><tbody id="prodTable"></tbody></table>
-    </div>
+    <button onclick="saveData('prod')">Save Yield</button>
+    <hr><span class="history-title">Recent Records</span>
+    <div id="prodList"></div>
   </div>
 </section>
 
 <section id="poultry">
   <div class="card">
-    <h3>🥚 Poultry Log</h3>
-    <div class="grid"><input type="date" id="pou_date"><input type="number" id="pou_eggs" placeholder="Eggs Collected"><input type="number" id="pou_dmg" placeholder="Damaged"></div>
-    <button onclick="saveData('poultry')">Save Entry</button>
-    <div class="table-wrapper">
-      <table><thead><tr><th>Date</th><th>Eggs</th><th>Dmg</th><th>Action</th></tr></thead><tbody id="poultryTable"></tbody></table>
-    </div>
+    <h3>🥚 Poultry Management</h3>
+    <div class="chart-box"><canvas id="poultryChart"></canvas></div>
+    <input type="date" id="pou_date">
+    <input id="pou_qty" type="number" placeholder="Good Eggs">
+    <input id="pou_dmg" type="number" placeholder="Damaged/Broken">
+    <button onclick="saveData('poultry')">Save Collection</button>
+    <hr><span class="history-title">Egg History</span>
+    <div id="poultryList"></div>
   </div>
 </section>
 
 <section id="breeding">
   <div class="card">
     <h3>🧬 Pedigree & Breeding</h3>
-    <div id="breedingGrid" class="grid"></div>
-    <div class="owner-only" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
-      <h4>New Pedigree Entry</h4>
-      <div class="grid">
-          <input id="b_name" placeholder="Animal Name/ID">
-          <input id="b_dam" placeholder="Dam (Mother)">
-          <input id="b_sire" placeholder="Sire (Father)">
-          <input type="date" id="b_date">
-      </div>
-      <button onclick="saveData('breeding')">Save Breeding Record</button>
-    </div>
+    <input id="b_dam" placeholder="Dam (Mother Tag)">
+    <input id="b_sire" placeholder="Sire (Father Tag)">
+    <label>Expected Due Date</label>
+    <input type="date" id="b_due">
+    <textarea id="b_notes" placeholder="Pregnancy/Outcome Notes"></textarea>
+    <button onclick="saveData('breeding')">Save Pedigree Record</button>
+    <hr><span class="history-title">Breeding History</span>
+    <div id="breedingList"></div>
   </div>
 </section>
 
 <section id="health">
   <div class="card">
-    <h3>💉 Health Records</h3>
-    <input id="h_id" placeholder="Animal ID"><input id="h_med" placeholder="Treatment/Vaccine"><input type="date" id="h_date">
-    <button onclick="saveData('health')">Record Health Event</button>
-    <div class="table-wrapper">
-      <table><thead><tr><th>Date</th><th>ID</th><th>Treatment</th><th>Action</th></tr></thead><tbody id="healthTable"></tbody></table>
-    </div>
+    <h3>💉 Health & Vaccination</h3>
+    <input id="h_id" placeholder="Animal Tag">
+    <input id="h_med" placeholder="Treatment / Vaccine Name">
+    <input type="date" id="h_date">
+    <button onclick="saveData('health')">Save Health Log</button>
+    <hr><span class="history-title">Treatment History</span>
+    <div id="healthList"></div>
   </div>
 </section>
 
 <section id="finance">
   <div class="card">
     <h3>💰 Financial Ledger</h3>
-    <div class="table-wrapper">
-      <table><thead><tr><th>Date</th><th>Desc</th><th>Type</th><th>Amt</th><th>Action</th></tr></thead><tbody id="financeTable"></tbody></table>
+    <div class="total-bar"><span>Current Net</span><span id="totalFin">0</span></div>
+    <div class="owner-only">
+        <input id="f_desc" placeholder="Details (e.g., Sold Pig)">
+        <input id="f_amt" type="number" placeholder="Amount">
+        <select id="f_type"><option value="Income">Income (+)</option><option value="Expense">Expense (-)</option></select>
+        <input type="date" id="f_date">
+        <button onclick="saveData('finance')">Post Transaction</button>
     </div>
-    <div class="owner-only" style="margin-top:20px; background:#f9f9f9; padding:15px; border-radius:10px;">
-      <h4>Post Transaction</h4>
-      <div class="grid">
-          <input id="f_desc" placeholder="e.g. Feed, Milk Sales">
-          <input id="f_amt" type="number" placeholder="Amount">
-          <select id="f_type"><option>Income</option><option>Expense</option></select>
-          <input type="date" id="f_date">
-      </div>
-      <button onclick="saveData('finance')">Save Transaction</button>
-    </div>
+    <hr><span class="history-title">Transaction History</span>
+    <div id="financeList"></div>
   </div>
 </section>
 
 <section id="reports">
-    <div class="card">
-        <h3>Reports & Exports</h3>
-        <button onclick="exportCSV()" style="background:#00796b">📥 Download Finance CSV</button>
-        <button onclick="window.print()" style="background:#444; margin-top:10px;">🖨️ Print Monthly PDF</button>
-        <div id="monthlyBreakdown" style="margin-top:20px"></div>
-    </div>
+  <div class="card">
+    <h3>📊 Monthly Reports & Archives</h3>
+    <div id="reportArea"></div>
+    <hr>
+    <h4>Comparison Archive</h4>
+    <div id="comparisonArea"></div>
+    <button onclick="window.print()" style="margin-top:20px; background:var(--dark);">Download PDF Report</button>
+  </div>
 </section>
 
 <section id="settings">
   <div class="card">
-    <h3>⚙️ Admin & Staff Access</h3>
-    <div style="border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
-        <h4>My Account</h4>
-        <input id="s_name" placeholder="Farm Name">
-        <input id="s_pass" type="password" placeholder="Change Owner Password">
+    <h3>⚙️ Staff Management</h3>
+    <div id="staffList"></div>
+    <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin-top:15px">
+        <h4>Create Staff Account</h4>
+        <input id="nw_name" placeholder="Name">
+        <input id="nw_pass" placeholder="Password">
+        <select id="nw_role"><option>Admin</option><option>Worker</option></select>
+        <button onclick="addWorker()">Register Worker</button>
     </div>
-    <div style="background:#fff9c4; padding:15px; border-radius:8px;">
-        <h4>Staff Access Control</h4>
-        <label>Worker Password</label>
-        <input id="s_worker_pass" placeholder="Worker1 Password">
-        <label>Worker Status</label>
-        <select id="s_worker_status">
-            <option value="active">✅ Access Granted</option>
-            <option value="locked">🚫 Account Locked</option>
-        </select>
-    </div>
-    <button onclick="saveSettings()" style="margin-top:20px;">Save Changes</button>
+    <hr>
+    <button onclick="monthlyReset()" style="background:var(--warn); color:black">🔄 Run Monthly Reset (Archive Data)</button>
+    <input type="password" id="s_owner_pass" placeholder="Change Master Password" style="margin-top:20px">
+    <button onclick="saveSettings()">Apply Global Settings</button>
   </div>
 </section>
 
 <script>
-let config = JSON.parse(localStorage.getItem("f_config") || JSON.stringify({ name: "Felix Farm", ownerPass: "Lovechild38816513@", workerPass: "Farm2024", workerStatus: "active" }));
-let db = { animals: JSON.parse(localStorage.getItem("f_animals")||"[]"), prod: JSON.parse(localStorage.getItem("f_prod")||"[]"), poultry: JSON.parse(localStorage.getItem("f_poultry")||"[]"), breeding: JSON.parse(localStorage.getItem("f_breeding")||"[]"), health: JSON.parse(localStorage.getItem("f_health")||"[]"), finance: JSON.parse(localStorage.getItem("f_finance")||"[]") };
+let config = JSON.parse(localStorage.getItem("f_config") || JSON.stringify({ ownerPass: "Lovechild38816513@", workers: [] }));
+let db = { animals:[], prod:[], poultry:[], breeding:[], health:[], finance:[], archive:[] };
+Object.keys(db).forEach(k => { db[k] = JSON.parse(localStorage.getItem("f_"+k) || "[]"); });
 
+let currentFilter = "All";
+let editingId = null;
+let charts = {};
+
+// --- AUTH ---
 function handleLogin() {
-    const user = userInp.value;
-    const pass = passInp.value;
-    if(user === "Felix" && pass === config.ownerPass) {
-        localStorage.setItem("loggedUser", user); initApp();
-    } else if (user === "Worker1" && pass === config.workerPass) {
-        if(config.workerStatus === "locked") { loginMsg.innerText = "Access Revoked by Owner."; }
-        else { localStorage.setItem("loggedUser", user); initApp(); }
-    } else { loginMsg.innerText = "Invalid Credentials"; }
+    const u = userInp.value, p = passInp.value;
+    const worker = config.workers.find(w => w.name === u && w.pass === p && w.status !== 'revoked');
+    if(u === "Felix" && p === config.ownerPass) { login("Felix", "Owner"); }
+    else if(worker) { login(worker.name, worker.role); }
+    else { alert("Invalid Credentials"); }
 }
-
+function login(name, role) { localStorage.setItem("loggedUser", name); localStorage.setItem("userRole", role); initApp(); }
 function logout() { localStorage.removeItem("loggedUser"); location.reload(); }
 
 function initApp() {
-    loginSection.classList.remove("active");
-    navbar.style.display = "flex";
-    document.querySelectorAll(".owner-only").forEach(el => el.style.display = (localStorage.getItem("loggedUser") === "Felix") ? "block" : "none");
+    loginSection.classList.remove("active"); navbar.style.display = "flex";
+    const role = localStorage.getItem("userRole");
+    document.querySelectorAll(".owner-only").forEach(el => el.style.display = (role==='Owner')?'block':'none');
+    document.getElementById('nav-fin').style.display = (role==='Owner' || role==='Admin')?'inline-block':'none';
     showSection('dashboard');
-    refreshUI();
 }
 
 function showSection(id) {
     document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
-    if(id === 'dashboard') renderChart();
-}
-
-let activeCat = "All";
-function filterCategory(cat, el) {
-    activeCat = cat;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    renderAnimalsList();
-}
-
-function renderAnimalsList() {
-    const list = db.animals.filter(a => activeCat === "All" || a.type === activeCat);
-    animalGrid.innerHTML = list.map(a => `<div class="card" style="border-top:2px solid #ccc; text-align:center;"><b>${a.tag}</b><br><small>${a.type}</small>${localStorage.getItem("loggedUser")==='Felix'?`<br><button class="btn-del" onclick="deleteItem('animals',${a.id})">Delete</button>`:''}</div>`).join('');
-}
-
-async function saveData(type) {
-    const entry = { id: Date.now() };
-    if(type==='animals'){ entry.tag=a_tag.value; entry.type=a_type.value; }
-    else if(type==='prod'){ entry.src=p_src.value; entry.qty=p_qty.value; entry.date=p_date.value; }
-    else if(type==='poultry'){ entry.date=pou_date.value; entry.eggs=pou_eggs.value; entry.dmg=pou_dmg.value; }
-    else if(type==='health'){ entry.animal=h_id.value; entry.med=h_med.value; entry.date=h_date.value; }
-    else if(type==='finance'){ entry.desc=f_desc.value; entry.amt=parseFloat(f_amt.value); entry.type=f_type.value; entry.date=f_date.value; }
-    else if(type==='breeding'){ entry.name=b_name.value; entry.dam=b_dam.value; entry.sire=b_sire.value; entry.date=b_date.value; }
-    
-    db[type].push(entry);
-    localStorage.setItem("f_"+type, JSON.stringify(db[type]));
     refreshUI();
-    alert("Saved!");
 }
 
-function deleteItem(key, id) {
-    if(confirm("Confirm Delete?")) { db[key] = db[key].filter(i => i.id !== id); localStorage.setItem("f_"+key, JSON.stringify(db[key])); refreshUI(); }
+// --- CRUD ENGINE ---
+function saveData(type) {
+    const id = editingId || Date.now();
+    const entry = { id, by: localStorage.getItem("loggedUser") };
+    
+    if(type==='animals'){ entry.tag=a_tag.value; entry.type=a_type.value; entry.breed=a_breed.value; }
+    else if(type==='prod'){ entry.tag=p_id.value; entry.qty=parseFloat(p_qty.value); entry.date=p_date.value; }
+    else if(type==='poultry'){ entry.date=pou_date.value; entry.qty=parseFloat(pou_qty.value); entry.dmg=parseFloat(pou_dmg.value); }
+    else if(type==='finance'){ entry.date=f_date.value; entry.desc=f_desc.value; entry.amt=parseFloat(f_amt.value); entry.type=f_type.value; }
+    else if(type==='health'){ entry.tag=h_id.value; entry.med=h_med.value; entry.date=h_date.value; }
+    else if(type==='breeding'){ entry.dam=b_dam.value; entry.sire=b_sire.value; entry.due=b_due.value; entry.notes=b_notes.value; }
+
+    if(editingId) db[type] = db[type].map(i => i.id === editingId ? entry : i);
+    else db[type].push(entry);
+
+    localStorage.setItem("f_"+type, JSON.stringify(db[type]));
+    editingId = null; refreshUI(); alert("Data Secured.");
 }
 
-function editItem(key, id) {
-    const item = db[key].find(i => i.id === id);
-    if(key==='prod'){ p_src.value=item.src; p_qty.value=item.qty; p_date.value=item.date; }
-    else if(key==='finance'){ f_desc.value=item.desc; f_amt.value=item.amt; f_type.value=item.type; f_date.value=item.date; }
-    deleteItem(key, id);
+function deleteItem(type, id) {
+    if(confirm("Permanently delete this record?")) {
+        db[type] = db[type].filter(i => i.id !== id);
+        localStorage.setItem("f_"+type, JSON.stringify(db[type]));
+        refreshUI();
+    }
 }
 
+function editItem(type, id) {
+    editingId = id;
+    const item = db[type].find(i => i.id === id);
+    if(type==='animals') { a_tag.value=item.tag; a_type.value=item.type; a_breed.value=item.breed; }
+    else if(type==='prod') { p_id.value=item.tag; p_qty.value=item.qty; p_date.value=item.date; }
+    else if(type==='poultry') { pou_date.value=item.date; pou_qty.value=item.qty; pou_dmg.value=item.dmg; }
+    else if(type==='finance') { f_date.value=item.date; f_desc.value=item.desc; f_amt.value=item.amt; f_type.value=item.type; }
+    else if(type==='health') { h_id.value=item.tag; h_med.value=item.med; h_date.value=item.date; }
+    else if(type==='breeding') { b_dam.value=item.dam; b_sire.value=item.sire; b_due.value=item.due; b_notes.value=item.notes; }
+    alert("Record loaded into form.");
+}
+
+function setFilter(cat, el) {
+    currentFilter = cat;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active'); refreshUI();
+}
+
+// --- UI RENDERER ---
 function refreshUI() {
-    const isFelix = localStorage.getItem("loggedUser") === "Felix";
-    const actionBtn = (id, key) => isFelix ? `<button class="btn-edit" onclick="editItem('${key}',${id})">E</button><button class="btn-del" onclick="deleteItem('${key}',${id})">X</button>` : '-';
-    
-    prodTable.innerHTML = db.prod.map(p => `<tr><td>${p.date}</td><td>${p.src}</td><td>${p.qty}</td><td>${actionBtn(p.id, 'prod')}</td></tr>`).join('');
-    poultryTable.innerHTML = db.poultry.map(p => `<tr><td>${p.date}</td><td>${p.eggs}</td><td>${p.dmg}</td><td>${actionBtn(p.id, 'poultry')}</td></tr>`).join('');
-    healthTable.innerHTML = db.health.map(h => `<tr><td>${h.date}</td><td>${h.animal}</td><td>${h.med}</td><td>${actionBtn(h.id, 'health')}</td></tr>`).join('');
-    financeTable.innerHTML = db.finance.map(f => `<tr><td>${f.date}</td><td>${f.desc}</td><td style="color:${f.type==='Income'?'green':'red'}">${f.type}</td><td>${f.amt}</td><td>${actionBtn(f.id, 'finance')}</td></tr>`).join('');
-    
-    renderAnimalsList();
-    
-    breedingGrid.innerHTML = db.breeding.map(b => `
-        <div class="breed-card">
-            <b>Animal: ${b.name}</b><br>
-            <div class="pedigree-box">
-                <div>D: ${b.dam}</div>
-                <div class="tree-line"></div>
-                <div>S: ${b.sire}</div>
-            </div>
-            <small>Date: ${b.date}</small>
-            ${isFelix?`<br><button class="btn-del" onclick="deleteItem('breeding',${b.id})">Delete</button>`:''}
-        </div>`).join('');
+    const role = localStorage.getItem("userRole");
+    const controls = (t,id) => `<div class="controls"><button class="btn-sm btn-edit" onclick="editItem('${t}',${id})">Edit</button>${(role==='Owner'||t!=='finance')?`<button class="btn-sm btn-del" onclick="deleteItem('${t}',${id})">X</button>`:''}</div>`;
 
-    statStock.innerText = db.animals.length;
-    let inc=0, exp=0; const m = new Date().toISOString().slice(0,7);
-    db.finance.filter(f=>f.date.startsWith(m)).forEach(f=>{ if(f.type==='Income') inc+=f.amt; else exp+=f.amt; });
-    statProfit.innerText = "KES " + (inc-exp);
+    animalList.innerHTML = db.animals.filter(a => (currentFilter==='All' || a.type===currentFilter) && a.tag.toLowerCase().includes(a_search.value.toLowerCase())).map(a => `<div class="data-row"><b>${a.tag} [${a.breed}]</b> ${controls('animals',a.id)}</div>`).join('');
+    
+    let net = 0;
+    financeList.innerHTML = db.finance.slice().reverse().map(f => {
+        const val = f.type==='Income'?f.amt:-f.amt; net += val;
+        return `<div class="data-row"><div><b>${f.desc}</b><br><small>${f.date}</small></div><b>${val}</b> ${controls('finance',f.id)}</div>`;
+    }).join('');
+    totalFin.innerText = "KES " + net; statProfit.innerText = net; statStock.innerText = db.animals.length;
+
+    prodList.innerHTML = db.prod.slice(-10).reverse().map(p => `<div class="data-row"><b>${p.tag}: ${p.qty}L</b> ${controls('prod',p.id)}</div>`).join('');
+    poultryList.innerHTML = db.poultry.slice(-10).reverse().map(p => `<div class="data-row"><b>${p.date}: ${p.qty} eggs</b> ${controls('poultry',p.id)}</div>`).join('');
+    healthList.innerHTML = db.health.slice().reverse().map(h => `<div class="data-row"><b>${h.tag}: ${h.med}</b> ${controls('health',h.id)}</div>`).join('');
+    breedingList.innerHTML = db.breeding.slice().reverse().map(b => `<div class="data-row"><b>${b.dam}x${b.sire} (Due: ${b.due})</b> ${controls('breeding',b.id)}</div>`).join('');
+    
+    comparisonArea.innerHTML = db.archive.map(a => `<div class="data-row"><b>${a.month}</b><span>Archived Balance: ${a.net}</span></div>`).join('');
+    staffList.innerHTML = config.workers.map((w,i) => `<div class="data-row"><b>${w.name} (${w.role})</b><button class="btn-sm btn-del" onclick="revokeStaff(${i})">Logout/Fire</button></div>`).join('');
+
+    updateCharts();
 }
 
-let chartObj = null;
-function renderChart() {
-    const ctx = mainChart.getContext('2d'); if(chartObj) chartObj.destroy();
-    chartObj = new Chart(ctx, { type: 'bar', data: { labels: ['Animals', 'Profit'], datasets:[{label:'Farm Stats', data:[db.animals.length, parseInt(statProfit.innerText.split(' ')[1])||0], backgroundColor:['#2e7d32','#ffa000']}] }});
+function updateCharts() {
+    const stockLabels = ['Cow','Goat','Sheep','Pig'];
+    renderChart('dashStockChart', 'doughnut', stockLabels, stockLabels.map(c => db.animals.filter(a => a.type === c).length), ['#2e7d32','#ffa000','#795548','#d32f2f']);
+    
+    const inc = db.finance.filter(f => f.type==='Income').reduce((s,f)=>s+f.amt,0);
+    const exp = db.finance.filter(f => f.type==='Expense').reduce((s,f)=>s+f.amt,0);
+    renderChart('dashFinanceChart', 'bar', ['Income','Expense'], [inc, exp], ['#2e7d32','#d32f2f']);
+
+    renderChart('milkTrendChart', 'line', db.prod.slice(-7).map(p => p.date), db.prod.slice(-7).map(p => p.qty), '#2e7d32');
+    renderChart('poultryChart', 'pie', ['Good','Damaged'], [db.poultry.reduce((s,p)=>s+p.qty,0), db.poultry.reduce((s,p)=>s+p.dmg,0)], ['#2e7d32','#d32f2f']);
 }
 
-function saveSettings() {
-    if(s_name.value) config.name = s_name.value;
-    if(s_pass.value) config.ownerPass = s_pass.value;
-    if(s_worker_pass.value) config.workerPass = s_worker_pass.value;
-    config.workerStatus = s_worker_status.value;
-    localStorage.setItem("f_config", JSON.stringify(config));
-    alert("Settings Saved!"); location.reload();
+function renderChart(id, type, labels, data, colors) {
+    if(charts[id]) charts[id].destroy();
+    const ctx = document.getElementById(id).getContext('2d');
+    charts[id] = new Chart(ctx, { type, data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: type==='line'?colors:'white', fill: false }] }, options: { responsive: true, maintainAspectRatio: false } });
 }
 
-function exportCSV() { let csv = "Date,Type,Amt\n"+db.finance.map(f=>`${f.date},${f.type},${f.amt}`).join("\n"); const a = document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download="FarmFinance.csv"; a.click(); }
+function monthlyReset() {
+    if(!confirm("This moves current finance and production to history and clears the screen. Continue?")) return;
+    const net = db.finance.reduce((s,f) => s + (f.type==='Income'?f.amt:-f.amt), 0);
+    db.archive.push({ month: new Date().toLocaleString('default', { month: 'long', year: 'numeric' }), net: net, finance: [...db.finance], prod: [...db.prod] });
+    db.finance = []; db.prod = [];
+    localStorage.setItem("f_archive", JSON.stringify(db.archive));
+    localStorage.setItem("f_finance", "[]"); localStorage.setItem("f_prod", "[]");
+    refreshUI();
+}
+
+function addWorker() { config.workers.push({ name: nw_name.value, pass: nw_pass.value, role: nw_role.value, status: 'active' }); saveSettings(); }
+function revokeStaff(i) { config.workers[i].status = 'revoked'; saveSettings(); }
+function saveSettings() { if(s_owner_pass.value) config.ownerPass = s_owner_pass.value; localStorage.setItem("f_config", JSON.stringify(config)); refreshUI(); alert("Updated."); }
 
 if(localStorage.getItem("loggedUser")) initApp();
 </script>
