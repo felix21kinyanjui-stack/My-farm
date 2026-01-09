@@ -2,328 +2,468 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Felix Farm Management - COMPLETE MASTER</title>
+<title>Farm Manager Pro - Felix</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root { --primary: #2e7d32; --danger: #d32f2f; --white: #ffffff; --dark: #1b5e20; --warn: #ffa000; }
-body { margin:0; font-family:'Segoe UI',sans-serif; background:#eef2f3; padding-bottom:70px; color:#333; }
-nav { display:none; background:var(--primary); padding:10px; overflow-x:auto; white-space:nowrap; position:sticky; top:0; z-index:1000; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
-nav button { background:rgba(255,255,255,0.2); border:none; color:white; padding:10px 15px; margin-right:5px; border-radius:20px; font-weight:bold; cursor:pointer; }
-section { display:none; padding:15px; max-width:900px; margin:auto; animation: fadeIn 0.2s; }
-section.active { display:block }
+:root { --primary: #2e7d32; --danger: #d32f2f; --light: #f4f6f8; --white: #ffffff; --warn: #ffa000; }
+body{margin:0;font-family:'Segoe UI',sans-serif;background:#eef2f3;padding-bottom:60px; color:#333;}
+nav { display:none; background:var(--primary); padding:10px; overflow-x:auto; white-space:nowrap; position:sticky; top:0; z-index:1000; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+nav button { background:rgba(255,255,255,0.2); border:none; color:white; padding:10px 18px; margin-right:5px; border-radius:20px; font-size:13px; font-weight:bold; cursor:pointer; }
+section { display:none; padding:15px; max-width:900px; margin:auto; animation: fadeIn 0.3s; }
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-.card { background:var(--white); padding:18px; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 12px rgba(0,0,0,0.08); border-top:5px solid var(--primary); }
-.chart-box { height: 220px; margin-bottom: 20px; }
-.search-bar { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; }
-.data-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff; border-radius: 8px; margin-bottom: 5px; }
-.controls { display: flex; gap: 5px; }
-.btn-sm { padding: 6px 10px; font-size: 11px; border-radius: 4px; border:none; cursor: pointer; font-weight:bold; }
-.btn-edit { background: var(--warn); color: #000; }
-.btn-del { background: var(--danger); color: #fff; }
-.tabs { display:flex; gap:5px; overflow-x:auto; margin-bottom:15px; padding-bottom:5px; }
-.tab { background:#ddd; padding:8px 15px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:bold; }
-.tab.active { background:var(--primary); color:white; }
-input, select, textarea, button { width:100%; padding:12px; margin-top:8px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:15px; }
-button { background:var(--primary); color:white; font-weight:bold; border:none; }
-#loginSection.active { display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; background: var(--dark); }
-.total-bar { background:var(--dark); color:white; padding:15px; border-radius:8px; display:flex; justify-content:space-between; font-weight:bold; margin: 10px 0; }
-.history-title { font-size: 14px; font-weight: bold; color: var(--primary); margin-bottom: 10px; display: block; }
+section.active { display:block }
+.card { background:var(--white); padding:20px; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 12px rgba(0,0,0,0.08); border-top:5px solid var(--primary); }
+h3, h4 { margin-top:0; color:var(--primary); border-bottom:1px solid #eee; padding-bottom:8px; display:flex; justify-content:space-between; align-items:center;}
+label { font-size:11px; font-weight:bold; color:#666; display:block; margin-top:12px; text-transform:uppercase; letter-spacing:0.5px; }
+input, select, button, textarea { width:100%; padding:12px; margin-top:6px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:15px; }
+button { background:var(--primary); color:white; font-weight:bold; border:none; cursor:pointer; transition: 0.2s; }
+button:active { transform: scale(0.98); }
+.btn-del { background:var(--danger); width:auto; padding:6px 12px; font-size:11px; margin-top:5px; border-radius:4px; color:white;}
+.btn-edit { background:var(--warn); width:auto; padding:6px 12px; font-size:11px; color:#000; margin-top:5px; border-radius:4px; }
+.filter-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+.tab { background: #ddd; padding: 10px 20px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; font-weight: bold; color:#555;}
+.tab.active { background: var(--primary); color: white; }
+.scroll-table { overflow-x: auto; margin-top:10px; border-radius:8px; border:1px solid #eee; }
+table { width:100%; border-collapse:collapse; background:white; font-size:13px; }
+th, td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
+th { background:#f8f9fa; color:#666; font-size:11px; text-transform:uppercase; }
+.total-bar { background:#2e7d32; color:white; font-weight:bold; padding:15px; border-radius:8px; margin-top:10px; display:flex; justify-content:space-between; font-size:16px;}
+#loginSection.active { display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; background:linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%); }
 </style>
 </head>
 <body>
 
 <nav id="navbar">
   <button onclick="showSection('dashboard')">🏠 Dash</button>
-  <button onclick="showSection('animals')">🐾 Stock</button>
+  <button onclick="showSection('animals')">🐾 Animals</button>
   <button onclick="showSection('production')">🥛 Milk</button>
   <button onclick="showSection('poultry')">🥚 Poultry</button>
   <button onclick="showSection('breeding')">🧬 Breeding</button>
   <button onclick="showSection('health')">💉 Health</button>
-  <button id="nav-fin" onclick="showSection('finance')">💰 Finance</button>
-  <button id="nav-rep" onclick="showSection('reports')">📊 Reports</button>
-  <button id="nav-set" onclick="showSection('settings')">⚙️ Settings</button>
+  <button class="owner-only" onclick="showSection('finance')">💰 Finance</button>
+  <button class="owner-only" onclick="showSection('reports')">📊 Reports</button>
+  <button class="owner-only" onclick="showSection('settings')">⚙️ Settings</button>
   <button onclick="logout()" style="background:var(--danger)">Logout</button>
 </nav>
 
 <section id="loginSection" class="active">
-  <div class="card" style="width:310px; border:none; text-align:center;">
-    <h2 style="color:var(--primary)">Felix Farm Master</h2>
+  <div class="card" style="width:320px; border-top:none;">
+    <h2 style="text-align:center; color:var(--primary)">Farm Manager Login</h2>
+    <label>Identify Yourself</label>
+    <select id="loginRole" style="margin-bottom:10px;">
+        <option value="Felix">Owner (Felix)</option>
+        <option value="Worker">Staff Member</option>
+    </select>
     <input type="text" id="userInp" placeholder="Username">
     <input type="password" id="passInp" placeholder="Password">
-    <button onclick="handleLogin()">Login</button>
+    <button onclick="handleLogin()">Sign In</button>
+    <p id="loginMsg" style="color:red; text-align:center; font-size:13px; font-weight:bold; margin-top:15px;"></p>
   </div>
 </section>
 
 <section id="dashboard">
-  <div style="display:flex; gap:10px;">
-    <div class="card" style="flex:1; text-align:center;"><label>Total Stock</label><br><b id="statStock" style="font-size:24px">0</b></div>
-    <div class="card" style="flex:1; text-align:center;"><label>Net Profit</label><br><b id="statProfit" style="font-size:18px">0</b></div>
+  <h3>Farm Overview</h3>
+  <div id="welcomeUser" style="margin-bottom:10px; font-weight:bold; color:var(--primary)"></div>
+  <div style="display:flex; gap:10px; margin-bottom:15px;">
+    <div class="card" style="flex:1; margin-bottom:0; text-align:center;">
+        <label>Total Stock</label><b id="statStock" style="font-size:24px">0</b>
+    </div>
+    <div class="card" style="flex:1; margin-bottom:0; text-align:center;">
+        <label>Monthly Net</label><b id="statProfit" style="font-size:20px; color:var(--primary);">KES 0</b>
+    </div>
   </div>
   <div class="card">
-    <label>Stock Distribution</label>
-    <div class="chart-box"><canvas id="dashStockChart"></canvas></div>
-  </div>
-  <div class="card">
-    <label>Financial Flow (Income vs Expense)</label>
-    <div class="chart-box"><canvas id="dashFinanceChart"></canvas></div>
+    <canvas id="mainChart" style="max-height:250px"></canvas>
   </div>
 </section>
 
 <section id="animals">
   <div class="card">
-    <h3>🐾 Livestock Inventory</h3>
-    <input type="text" class="search-bar" id="a_search" placeholder="Search Tag/Breed..." onkeyup="refreshUI()">
-    <div class="tabs">
-        <div class="tab active" onclick="setFilter('All', this)">All</div>
-        <div class="tab" onclick="setFilter('Cow', this)">Cow</div>
-        <div class="tab" onclick="setFilter('Goat', this)">Goat</div>
-        <div class="tab" onclick="setFilter('Sheep', this)">Sheep</div>
-        <div class="tab" onclick="setFilter('Pig', this)">Pig</div>
+    <h3>Animal Stock List</h3>
+    <div class="filter-tabs">
+        <div class="tab active" onclick="filterCat('All', this)">All</div>
+        <div class="tab" onclick="filterCat('Cow', this)">Cows</div>
+        <div class="tab" onclick="filterCat('Goat', this)">Goats</div>
+        <div class="tab" onclick="filterCat('Sheep', this)">Sheep</div>
+        <div class="tab" onclick="filterCat('Pig', this)">Pigs</div>
     </div>
-    <div id="animalList"></div>
-    <div class="owner-only" style="border-top:1px solid #eee; margin-top:20px; padding-top:10px;">
-        <h4>Add / Update Animal</h4>
-        <input id="a_tag" placeholder="Tag ID">
-        <select id="a_type"><option>Cow</option><option>Goat</option><option>Sheep</option><option>Pig</option></select>
-        <input id="a_breed" placeholder="Breed Info">
-        <button onclick="saveData('animals')">Save to Stock</button>
+    <div id="animalDisplay" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
+    
+    <div class="owner-only input-area" style="margin-top:20px; border-top:2px solid #eee; padding-top:15px;">
+        <h4>Register New Animal</h4>
+        <label>Tag ID / Name</label><input id="a_tag" placeholder="e.g. IA 4716">
+        <label>Category</label><select id="a_type"><option>Cow</option><option>Goat</option><option>Sheep</option><option>Pig</option></select>
+        <label>Breed / Detail</label><input id="a_breed" placeholder="e.g. Boer 100%">
+        <label>Sex</label><select id="a_sex"><option>Female (F)</option><option>Male (M)</option></select>
+        <button onclick="saveData('animals')">Save to Inventory</button>
     </div>
   </div>
 </section>
 
 <section id="production">
   <div class="card">
-    <h3>🥛 Milk Production</h3>
-    <div class="chart-box"><canvas id="milkTrendChart"></canvas></div>
-    <input id="p_id" placeholder="Animal Tag">
-    <input id="p_qty" type="number" placeholder="Liters Produced">
-    <input type="date" id="p_date">
-    <button onclick="saveData('prod')">Save Yield</button>
-    <hr><span class="history-title">Recent Records</span>
-    <div id="prodList"></div>
+    <h3>🥛 Production Log</h3>
+    <div class="input-area">
+        <label>Animal Tag</label><input id="p_id" placeholder="ID">
+        <label>Quantity (Ltrs/Kgs)</label><input id="p_qty" type="number">
+        <label>Date</label><input type="date" id="p_date">
+        <button onclick="saveData('prod')">Record Production</button>
+    </div>
+    <div class="scroll-table">
+        <table><thead><tr><th>Date</th><th>ID</th><th>Qty</th><th>By</th><th>Action</th></tr></thead><tbody id="prodTable"></tbody></table>
+    </div>
   </div>
 </section>
 
 <section id="poultry">
   <div class="card">
-    <h3>🥚 Poultry Management</h3>
-    <div class="chart-box"><canvas id="poultryChart"></canvas></div>
-    <input type="date" id="pou_date">
-    <input id="pou_qty" type="number" placeholder="Good Eggs">
-    <input id="pou_dmg" type="number" placeholder="Damaged/Broken">
-    <button onclick="saveData('poultry')">Save Collection</button>
-    <hr><span class="history-title">Egg History</span>
-    <div id="poultryList"></div>
+    <h3>🥚 Poultry Daily Save</h3>
+    <div class="input-area">
+        <label>Date</label><input type="date" id="pou_date">
+        <div style="display:flex; gap:10px">
+            <div style="flex:1"><label>Eggs Collected</label><input id="pou_qty" type="number"></div>
+            <div style="flex:1"><label>Damaged</label><input id="pou_dmg" type="number"></div>
+        </div>
+        <button onclick="saveData('poultry')">Save Collection</button>
+    </div>
+    <div class="scroll-table">
+        <table><thead><tr><th>Date</th><th>Qty</th><th>Dmg</th><th>By</th><th>Action</th></tr></thead><tbody id="poultryTable"></tbody></table>
+    </div>
   </div>
 </section>
 
 <section id="breeding">
   <div class="card">
-    <h3>🧬 Pedigree & Breeding</h3>
-    <input id="b_dam" placeholder="Dam (Mother Tag)">
-    <input id="b_sire" placeholder="Sire (Father Tag)">
-    <label>Expected Due Date</label>
-    <input type="date" id="b_due">
-    <textarea id="b_notes" placeholder="Pregnancy/Outcome Notes"></textarea>
-    <button onclick="saveData('breeding')">Save Pedigree Record</button>
-    <hr><span class="history-title">Breeding History</span>
-    <div id="breedingList"></div>
+    <h3>🧬 Breeding Records</h3>
+    <div id="breedingDisplay"></div>
+    <div class="owner-only input-area" style="margin-top:20px; border-top:2px solid #eee; padding-top:15px;">
+        <h4>New Breeding Card</h4>
+        <label>Dam (Mother)</label><input id="b_dam">
+        <label>Sire (Father)</label><input id="b_sire">
+        <div style="display:flex; gap:10px">
+            <div style="flex:1"><label>Due Date</label><input type="date" id="b_due"></div>
+            <div style="flex:1"><label>Date Born</label><input type="date" id="b_born"></div>
+        </div>
+        <label>Outcome (Sold/Kept/Notes)</label><input id="b_notes" placeholder="e.g. 2 Kids, Kept">
+        <button onclick="saveData('breeding')">Save Breeding Event</button>
+    </div>
   </div>
 </section>
 
 <section id="health">
   <div class="card">
-    <h3>💉 Health & Vaccination</h3>
-    <input id="h_id" placeholder="Animal Tag">
-    <input id="h_med" placeholder="Treatment / Vaccine Name">
-    <input type="date" id="h_date">
-    <button onclick="saveData('health')">Save Health Log</button>
-    <hr><span class="history-title">Treatment History</span>
-    <div id="healthList"></div>
+    <h3>💉 Health & Vaccines</h3>
+    <div class="input-area">
+        <label>Animal ID</label><input id="h_id">
+        <label>Vaccine / Treatment</label><input id="h_med">
+        <div style="display:flex; gap:10px">
+            <div style="flex:1"><label>Date Given</label><input type="date" id="h_date"></div>
+            <div style="flex:1"><label>Booster Due</label><input type="date" id="h_booster"></div>
+        </div>
+        <label>Vet Notes</label><textarea id="h_notes"></textarea>
+        <button onclick="saveData('health')">Save Health Record</button>
+    </div>
+    <div id="healthDisplay" style="margin-top:15px"></div>
   </div>
 </section>
 
 <section id="finance">
   <div class="card">
-    <h3>💰 Financial Ledger</h3>
-    <div class="total-bar"><span>Current Net</span><span id="totalFin">0</span></div>
-    <div class="owner-only">
-        <input id="f_desc" placeholder="Details (e.g., Sold Pig)">
-        <input id="f_amt" type="number" placeholder="Amount">
-        <select id="f_type"><option value="Income">Income (+)</option><option value="Expense">Expense (-)</option></select>
-        <input type="date" id="f_date">
-        <button onclick="saveData('finance')">Post Transaction</button>
+    <h3>💰 Daily Cash Report</h3>
+    <div class="scroll-table">
+        <table class="fin-table">
+            <thead><tr><th>Date</th><th>Details</th><th>Amt</th><th>By</th><th>Action</th></tr></thead>
+            <tbody id="financeTable"></tbody>
+        </table>
     </div>
-    <hr><span class="history-title">Transaction History</span>
-    <div id="financeList"></div>
+    <div class="total-bar"><span>NET RECEIPTS</span><span id="totalFin">KES 0</span></div>
+
+    <div class="owner-only input-area" style="margin-top:20px; border-top:2px dotted #ccc; padding-top:15px;">
+        <h4>Add Transaction</h4>
+        <label>Details</label><input id="f_desc">
+        <label>Amount (KES)</label><input id="f_amt" type="number">
+        <label>Type</label>
+        <select id="f_type">
+            <option value="Income">Income (+)</option>
+            <option value="Expense">Expense (-)</option>
+        </select>
+        <label>Date</label><input type="date" id="f_date">
+        <button onclick="saveData('finance')">Post to Ledger</button>
+    </div>
   </div>
 </section>
 
 <section id="reports">
   <div class="card">
-    <h3>📊 Monthly Reports & Archives</h3>
-    <div id="reportArea"></div>
+    <h3>📊 Monthly Reports</h3>
+    <button onclick="window.print()" style="background:#444">🖨️ Print Current Report</button>
+    <button onclick="exportCSV()" style="margin-top:10px; background:#00796b">📥 Export CSV Ledger</button>
     <hr>
-    <h4>Comparison Archive</h4>
-    <div id="comparisonArea"></div>
-    <button onclick="window.print()" style="margin-top:20px; background:var(--dark);">Download PDF Report</button>
+    <h4>Monthly Comparison</h4>
+    <div id="monthlyStats"></div>
   </div>
 </section>
 
 <section id="settings">
   <div class="card">
-    <h3>⚙️ Staff Management</h3>
-    <div id="staffList"></div>
-    <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin-top:15px">
-        <h4>Create Staff Account</h4>
-        <input id="nw_name" placeholder="Name">
-        <input id="nw_pass" placeholder="Password">
-        <select id="nw_role"><option>Admin</option><option>Worker</option></select>
-        <button onclick="addWorker()">Register Worker</button>
+    <h3>⚙️ Admin Settings</h3>
+    <label>Change Owner Password</label><input type="password" id="s_pass" placeholder="New Password">
+    <button onclick="saveSettings()" style="margin-top:10px;">Update Master Password</button>
+    
+    <hr style="margin:20px 0;">
+    
+    <h3>👥 Staff Management</h3>
+    <div class="scroll-table">
+        <table>
+            <thead><tr><th>Username</th><th>Password</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="workerList"></tbody>
+        </table>
     </div>
-    <hr>
-    <button onclick="monthlyReset()" style="background:var(--warn); color:black">🔄 Run Monthly Reset (Archive Data)</button>
-    <input type="password" id="s_owner_pass" placeholder="Change Master Password" style="margin-top:20px">
-    <button onclick="saveSettings()">Apply Global Settings</button>
+    
+    <div style="background:#fff9c4; padding:15px; border-radius:8px; margin-top:15px;">
+        <h4 id="workerFormTitle">Add New Worker</h4>
+        <input type="hidden" id="editWorkerIndex" value="">
+        <label>Worker Username</label><input id="nw_name" placeholder="Name">
+        <label>Worker Password</label><input id="nw_pass" placeholder="Password">
+        <label>Account Status</label>
+        <select id="nw_status">
+            <option value="active">✅ Access Active</option>
+            <option value="locked">🚫 Account Locked</option>
+        </select>
+        <button id="workerBtn" onclick="addOrUpdateWorker()" style="margin-top:15px;">Register Worker</button>
+        <button id="cancelBtn" onclick="resetWorkerForm()" style="background:#888; margin-top:5px; display:none;">Cancel Edit</button>
+    </div>
   </div>
 </section>
 
 <script>
-let config = JSON.parse(localStorage.getItem("f_config") || JSON.stringify({ ownerPass: "Lovechild38816513@", workers: [] }));
-let db = { animals:[], prod:[], poultry:[], breeding:[], health:[], finance:[], archive:[] };
-Object.keys(db).forEach(k => { db[k] = JSON.parse(localStorage.getItem("f_"+k) || "[]"); });
+// --- DATA INITIALIZATION ---
+let config = JSON.parse(localStorage.getItem("f_config") || JSON.stringify({ 
+    ownerPass: "Lovechild38816513@", 
+    workers: [] // Array of {name, pass, status}
+}));
 
-let currentFilter = "All";
-let editingId = null;
-let charts = {};
+let db = {
+    animals: JSON.parse(localStorage.getItem("f_animals") || "[]"),
+    prod: JSON.parse(localStorage.getItem("f_prod") || "[]"),
+    poultry: JSON.parse(localStorage.getItem("f_poultry") || "[]"),
+    breeding: JSON.parse(localStorage.getItem("f_breeding") || "[]"),
+    health: JSON.parse(localStorage.getItem("f_health") || "[]"),
+    finance: JSON.parse(localStorage.getItem("f_finance") || "[]")
+};
 
-// --- AUTH ---
+// --- SECURITY & LOGIN ---
 function handleLogin() {
-    const u = userInp.value, p = passInp.value;
-    const worker = config.workers.find(w => w.name === u && w.pass === p && w.status !== 'revoked');
-    if(u === "Felix" && p === config.ownerPass) { login("Felix", "Owner"); }
-    else if(worker) { login(worker.name, worker.role); }
-    else { alert("Invalid Credentials"); }
+    const role = loginRole.value;
+    const user = userInp.value;
+    const pass = passInp.value;
+
+    if(role === "Felix") {
+        if(user === "Felix" && pass === config.ownerPass) {
+            loginSuccess("Felix", "Owner");
+        } else { loginMsg.innerText = "Invalid Owner Credentials."; }
+    } else {
+        const found = config.workers.find(w => w.name === user && w.pass === pass);
+        if(found) {
+            if(found.status === "locked") loginMsg.innerText = "Account Locked by Felix.";
+            else loginSuccess(found.name, "Worker");
+        } else { loginMsg.innerText = "Worker not found or wrong password."; }
+    }
 }
-function login(name, role) { localStorage.setItem("loggedUser", name); localStorage.setItem("userRole", role); initApp(); }
-function logout() { localStorage.removeItem("loggedUser"); location.reload(); }
+
+function loginSuccess(name, role) {
+    localStorage.setItem("loggedUser", name);
+    localStorage.setItem("userRole", role);
+    initApp();
+}
+
+function logout() { localStorage.removeItem("loggedUser"); localStorage.removeItem("userRole"); location.reload(); }
 
 function initApp() {
-    loginSection.classList.remove("active"); navbar.style.display = "flex";
+    loginSection.classList.remove("active");
+    navbar.style.display = "flex";
+    const user = localStorage.getItem("loggedUser");
     const role = localStorage.getItem("userRole");
-    document.querySelectorAll(".owner-only").forEach(el => el.style.display = (role==='Owner')?'block':'none');
-    document.getElementById('nav-fin').style.display = (role==='Owner' || role==='Admin')?'inline-block':'none';
+    
+    welcomeUser.innerText = "Welcome, " + user;
+    document.querySelectorAll(".owner-only").forEach(el => el.style.display = (role === "Owner") ? "block" : "none");
     showSection('dashboard');
+    refreshUI();
 }
 
 function showSection(id) {
     document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
-    refreshUI();
+    if(id === 'dashboard') renderChart();
+    if(id === 'settings') renderWorkerList();
 }
 
-// --- CRUD ENGINE ---
-function saveData(type) {
-    const id = editingId || Date.now();
-    const entry = { id, by: localStorage.getItem("loggedUser") };
+// --- WORKER CRUD ---
+function renderWorkerList() {
+    workerList.innerHTML = config.workers.map((w, i) => `
+        <tr>
+            <td>${w.name}</td>
+            <td>****</td>
+            <td>${w.status === 'active' ? '✅' : '🚫'}</td>
+            <td>
+                <button class="btn-edit" onclick="editWorker(${i})">Edit</button>
+                <button class="btn-del" onclick="deleteWorker(${i})">X</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function addOrUpdateWorker() {
+    const name = nw_name.value, pass = nw_pass.value, status = nw_status.value, idx = editWorkerIndex.value;
+    if(!name || !pass) return alert("Fill all fields");
     
-    if(type==='animals'){ entry.tag=a_tag.value; entry.type=a_type.value; entry.breed=a_breed.value; }
-    else if(type==='prod'){ entry.tag=p_id.value; entry.qty=parseFloat(p_qty.value); entry.date=p_date.value; }
-    else if(type==='poultry'){ entry.date=pou_date.value; entry.qty=parseFloat(pou_qty.value); entry.dmg=parseFloat(pou_dmg.value); }
-    else if(type==='finance'){ entry.date=f_date.value; entry.desc=f_desc.value; entry.amt=parseFloat(f_amt.value); entry.type=f_type.value; }
-    else if(type==='health'){ entry.tag=h_id.value; entry.med=h_med.value; entry.date=h_date.value; }
-    else if(type==='breeding'){ entry.dam=b_dam.value; entry.sire=b_sire.value; entry.due=b_due.value; entry.notes=b_notes.value; }
-
-    if(editingId) db[type] = db[type].map(i => i.id === editingId ? entry : i);
-    else db[type].push(entry);
-
-    localStorage.setItem("f_"+type, JSON.stringify(db[type]));
-    editingId = null; refreshUI(); alert("Data Secured.");
+    if(idx === "") config.workers.push({name, pass, status});
+    else config.workers[idx] = {name, pass, status};
+    
+    localStorage.setItem("f_config", JSON.stringify(config));
+    resetWorkerForm(); renderWorkerList(); alert("Staff records updated.");
 }
 
-function deleteItem(type, id) {
-    if(confirm("Permanently delete this record?")) {
-        db[type] = db[type].filter(i => i.id !== id);
-        localStorage.setItem("f_"+type, JSON.stringify(db[type]));
+function editWorker(i) {
+    const w = config.workers[i];
+    nw_name.value = w.name; nw_pass.value = w.pass; nw_status.value = w.status;
+    editWorkerIndex.value = i;
+    workerFormTitle.innerText = "Edit Worker";
+    workerBtn.innerText = "Update Worker";
+    cancelBtn.style.display = "block";
+}
+
+function deleteWorker(i) {
+    if(confirm("Delete this worker account?")) {
+        config.workers.splice(i, 1);
+        localStorage.setItem("f_config", JSON.stringify(config));
+        renderWorkerList();
+    }
+}
+
+function resetWorkerForm() {
+    nw_name.value = ""; nw_pass.value = ""; nw_status.value = "active";
+    editWorkerIndex.value = "";
+    workerFormTitle.innerText = "Add New Worker";
+    workerBtn.innerText = "Register Worker";
+    cancelBtn.style.display = "none";
+}
+
+// --- PERSISTENCE ---
+function saveData(type) {
+    const entry = { 
+        id: Date.now(), 
+        by: localStorage.getItem("loggedUser") 
+    };
+    
+    if(type==='animals'){ entry.tag=a_tag.value; entry.type=a_type.value; entry.breed=a_breed.value; entry.sex=a_sex.value; }
+    else if(type==='prod'){ entry.date=p_date.value; entry.tag=p_id.value; entry.qty=p_qty.value; }
+    else if(type==='poultry'){ entry.date=pou_date.value; entry.qty=pou_qty.value; entry.dmg=pou_dmg.value; }
+    else if(type==='breeding'){ entry.dam=b_dam.value; entry.sire=b_sire.value; entry.due=b_due.value; entry.born=b_born.value; entry.notes=b_notes.value; }
+    else if(type==='health'){ entry.tag=h_id.value; entry.med=h_med.value; entry.date=h_date.value; entry.booster=h_booster.value; entry.notes=h_notes.value; }
+    else if(type==='finance'){ entry.date=f_date.value; entry.desc=f_desc.value; entry.amt=parseFloat(f_amt.value); entry.type=f_type.value; }
+    
+    db[type].push(entry);
+    localStorage.setItem("f_" + type, JSON.stringify(db[type]));
+    refreshUI();
+    alert("Saved by " + entry.by);
+}
+
+function deleteItem(key, id) {
+    if(confirm("Permanently delete?")) {
+        db[key] = db[key].filter(i => i.id !== id);
+        localStorage.setItem("f_" + key, JSON.stringify(db[key]));
         refreshUI();
     }
 }
 
-function editItem(type, id) {
-    editingId = id;
-    const item = db[type].find(i => i.id === id);
-    if(type==='animals') { a_tag.value=item.tag; a_type.value=item.type; a_breed.value=item.breed; }
-    else if(type==='prod') { p_id.value=item.tag; p_qty.value=item.qty; p_date.value=item.date; }
-    else if(type==='poultry') { pou_date.value=item.date; pou_qty.value=item.qty; pou_dmg.value=item.dmg; }
-    else if(type==='finance') { f_date.value=item.date; f_desc.value=item.desc; f_amt.value=item.amt; f_type.value=item.type; }
-    else if(type==='health') { h_id.value=item.tag; h_med.value=item.med; h_date.value=item.date; }
-    else if(type==='breeding') { b_dam.value=item.dam; b_sire.value=item.sire; b_due.value=item.due; b_notes.value=item.notes; }
-    alert("Record loaded into form.");
+function editItem(key, id) {
+    const item = db[key].find(i => i.id === id);
+    if(key==='finance'){ f_date.value=item.date; f_desc.value=item.desc; f_amt.value=item.amt; f_type.value=item.type; }
+    else if(key==='prod'){ p_date.value=item.date; p_id.value=item.tag; p_qty.value=item.qty; }
+    deleteItem(key, id);
 }
 
-function setFilter(cat, el) {
+// --- FILTERING ---
+let currentFilter = "All";
+function filterCat(cat, el) {
     currentFilter = cat;
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active'); refreshUI();
+    el.classList.add('active');
+    renderAnimalStock();
 }
 
-// --- UI RENDERER ---
+function renderAnimalStock() {
+    const list = db.animals.filter(a => currentFilter === "All" || a.type === currentFilter);
+    animalDisplay.innerHTML = list.map(a => `
+        <div class="card" style="border-top:2px solid #ccc; font-size:12px; padding:10px;">
+            <b>${a.tag}</b><br>${a.breed}<br><small>${a.sex}</small>
+            ${localStorage.getItem("userRole")==='Owner' ? `<br><button class="btn-del" onclick="deleteItem('animals',${a.id})">Delete</button>` : ''}
+        </div>`).join('');
+}
+
+// --- REFRESH UI ---
 function refreshUI() {
-    const role = localStorage.getItem("userRole");
-    const controls = (t,id) => `<div class="controls"><button class="btn-sm btn-edit" onclick="editItem('${t}',${id})">Edit</button>${(role==='Owner'||t!=='finance')?`<button class="btn-sm btn-del" onclick="deleteItem('${t}',${id})">X</button>`:''}</div>`;
-
-    animalList.innerHTML = db.animals.filter(a => (currentFilter==='All' || a.type===currentFilter) && a.tag.toLowerCase().includes(a_search.value.toLowerCase())).map(a => `<div class="data-row"><b>${a.tag} [${a.breed}]</b> ${controls('animals',a.id)}</div>`).join('');
+    const isOwner = localStorage.getItem("userRole") === "Owner";
+    const act = (id, k) => isOwner ? `<button class="btn-edit" onclick="editItem('${k}',${id})">Edit</button><button class="btn-del" onclick="deleteItem('${k}',${id})">X</button>` : `<small>by ${db[k].find(x=>x.id===id).by}</small>`;
     
+    prodTable.innerHTML = db.prod.map(p => `<tr><td>${p.date}</td><td>${p.tag}</td><td>${p.qty}</td><td>${p.by||'Sys'}</td><td>${act(p.id,'prod')}</td></tr>`).join('');
+    poultryTable.innerHTML = db.poultry.map(p => `<tr><td>${p.date}</td><td>${p.qty}</td><td>${p.dmg}</td><td>${p.by||'Sys'}</td><td>${act(p.id,'poultry')}</td></tr>`).join('');
+    
+    breedingDisplay.innerHTML = db.breeding.map(b => `
+        <div class="card">
+            <div style="display:flex; justify-content:space-between"><b>Dam: ${b.dam}</b><b>Sire: ${b.sire}</b></div>
+            <div style="font-size:12px; color:#666; margin:5px 0;">Due: ${b.due} | Born: ${b.born}</div>
+            <div style="background:#f9f9f9; padding:5px; border-radius:4px;">Result: ${b.notes}</div>
+            <small>Log: ${b.by||'Sys'}</small>${isOwner ? `<br><button class="btn-del" onclick="deleteItem('breeding',${b.id})">Delete</button>` : ''}
+        </div>`).join('');
+
+    healthDisplay.innerHTML = db.health.map(h => `
+        <div class="card" style="border-left:4px solid var(--primary); border-top:none;">
+            <b>${h.tag}: ${h.med}</b><br><small>Date: ${h.date} | Booster: ${h.booster}</small>
+            <p style="font-size:12px; margin:5px 0;">${h.notes}</p>
+            <small>By: ${h.by||'Sys'}</small>${isOwner ? `<br><button class="btn-del" onclick="deleteItem('health',${h.id})">Delete</button>` : ''}
+        </div>`).join('');
+
     let net = 0;
-    financeList.innerHTML = db.finance.slice().reverse().map(f => {
-        const val = f.type==='Income'?f.amt:-f.amt; net += val;
-        return `<div class="data-row"><div><b>${f.desc}</b><br><small>${f.date}</small></div><b>${val}</b> ${controls('finance',f.id)}</div>`;
+    financeTable.innerHTML = db.finance.map(f => {
+        const val = f.type === 'Income' ? f.amt : -f.amt; net += val;
+        return `<tr><td>${f.date}</td><td>${f.desc}</td><td style="color:${val>=0?'green':'red'}">${val}</td><td>${f.by||'Sys'}</td><td>${act(f.id,'finance')}</td></tr>`;
     }).join('');
-    totalFin.innerText = "KES " + net; statProfit.innerText = net; statStock.innerText = db.animals.length;
-
-    prodList.innerHTML = db.prod.slice(-10).reverse().map(p => `<div class="data-row"><b>${p.tag}: ${p.qty}L</b> ${controls('prod',p.id)}</div>`).join('');
-    poultryList.innerHTML = db.poultry.slice(-10).reverse().map(p => `<div class="data-row"><b>${p.date}: ${p.qty} eggs</b> ${controls('poultry',p.id)}</div>`).join('');
-    healthList.innerHTML = db.health.slice().reverse().map(h => `<div class="data-row"><b>${h.tag}: ${h.med}</b> ${controls('health',h.id)}</div>`).join('');
-    breedingList.innerHTML = db.breeding.slice().reverse().map(b => `<div class="data-row"><b>${b.dam}x${b.sire} (Due: ${b.due})</b> ${controls('breeding',b.id)}</div>`).join('');
     
-    comparisonArea.innerHTML = db.archive.map(a => `<div class="data-row"><b>${a.month}</b><span>Archived Balance: ${a.net}</span></div>`).join('');
-    staffList.innerHTML = config.workers.map((w,i) => `<div class="data-row"><b>${w.name} (${w.role})</b><button class="btn-sm btn-del" onclick="revokeStaff(${i})">Logout/Fire</button></div>`).join('');
+    totalFin.innerText = "KES " + net;
+    statProfit.innerText = "KES " + net;
+    statStock.innerText = db.animals.length;
 
-    updateCharts();
+    renderAnimalStock();
 }
 
-function updateCharts() {
-    const stockLabels = ['Cow','Goat','Sheep','Pig'];
-    renderChart('dashStockChart', 'doughnut', stockLabels, stockLabels.map(c => db.animals.filter(a => a.type === c).length), ['#2e7d32','#ffa000','#795548','#d32f2f']);
-    
-    const inc = db.finance.filter(f => f.type==='Income').reduce((s,f)=>s+f.amt,0);
-    const exp = db.finance.filter(f => f.type==='Expense').reduce((s,f)=>s+f.amt,0);
-    renderChart('dashFinanceChart', 'bar', ['Income','Expense'], [inc, exp], ['#2e7d32','#d32f2f']);
-
-    renderChart('milkTrendChart', 'line', db.prod.slice(-7).map(p => p.date), db.prod.slice(-7).map(p => p.qty), '#2e7d32');
-    renderChart('poultryChart', 'pie', ['Good','Damaged'], [db.poultry.reduce((s,p)=>s+p.qty,0), db.poultry.reduce((s,p)=>s+p.dmg,0)], ['#2e7d32','#d32f2f']);
+let chartObj = null;
+function renderChart() {
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    if(chartObj) chartObj.destroy();
+    chartObj = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: db.finance.slice(-5).map(f => f.date),
+            datasets: [{ label: 'Cash Flow', data: db.finance.slice(-5).map(f => f.amt), borderColor: '#2e7d32', fill: false }]
+        }
+    });
 }
 
-function renderChart(id, type, labels, data, colors) {
-    if(charts[id]) charts[id].destroy();
-    const ctx = document.getElementById(id).getContext('2d');
-    charts[id] = new Chart(ctx, { type, data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: type==='line'?colors:'white', fill: false }] }, options: { responsive: true, maintainAspectRatio: false } });
+function saveSettings() {
+    if(s_pass.value) config.ownerPass = s_pass.value;
+    localStorage.setItem("f_config", JSON.stringify(config));
+    alert("Owner password updated.");
 }
 
-function monthlyReset() {
-    if(!confirm("This moves current finance and production to history and clears the screen. Continue?")) return;
-    const net = db.finance.reduce((s,f) => s + (f.type==='Income'?f.amt:-f.amt), 0);
-    db.archive.push({ month: new Date().toLocaleString('default', { month: 'long', year: 'numeric' }), net: net, finance: [...db.finance], prod: [...db.prod] });
-    db.finance = []; db.prod = [];
-    localStorage.setItem("f_archive", JSON.stringify(db.archive));
-    localStorage.setItem("f_finance", "[]"); localStorage.setItem("f_prod", "[]");
-    refreshUI();
+function exportCSV() {
+    let csv = "Date,Description,Type,Amount,By\n" + db.finance.map(f => `${f.date},${f.desc},${f.type},${f.amt},${f.by}`).join("\n");
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', 'FarmLedger.csv'); a.click();
 }
-
-function addWorker() { config.workers.push({ name: nw_name.value, pass: nw_pass.value, role: nw_role.value, status: 'active' }); saveSettings(); }
-function revokeStaff(i) { config.workers[i].status = 'revoked'; saveSettings(); }
-function saveSettings() { if(s_owner_pass.value) config.ownerPass = s_owner_pass.value; localStorage.setItem("f_config", JSON.stringify(config)); refreshUI(); alert("Updated."); }
 
 if(localStorage.getItem("loggedUser")) initApp();
 </script>
